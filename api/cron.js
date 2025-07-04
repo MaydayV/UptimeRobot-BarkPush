@@ -1,8 +1,8 @@
 const axios = require('axios');
-// Use a single configuration file that handles environment variables
+
 const config = require('../config');
 
-// Cache to track monitor states to avoid duplicate notifications
+
 let monitorStateCache = {};
 
 /**
@@ -36,7 +36,7 @@ async function getMonitors() {
       return [];
     }
 
-    // If specific monitor IDs are configured, filter the results
+    
     if (config.monitorIds && config.monitorIds.length > 0) {
       return response.data.monitors.filter(monitor => 
         config.monitorIds.includes(monitor.id.toString()));
@@ -112,16 +112,16 @@ async function checkMonitors() {
     const currentStatus = monitor.status;
     const prevStatus = monitorStateCache[monitor.id];
     
-    // Update the cache
+    
     monitorStateCache[monitor.id] = currentStatus;
     
-    // If this is the first check or status changed to down, send notification
+    
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
       const title = `🔴 Website Down: ${monitor.friendly_name}`;
       
       let message = `Status: ${getStatusText(currentStatus)}\n`;
       
-      // Add the latest log if available
+      
       if (monitor.logs && monitor.logs.length > 0) {
         const latestLog = monitor.logs[0];
         message += `Since: ${formatTime(latestLog.datetime)}\n`;
@@ -137,13 +137,13 @@ async function checkMonitors() {
       });
     }
     
-    // If status changed from down to up, send recovery notification if enabled
+    
     else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && config.sendRecoveryNotifications) {
       const title = `🟢 Website Recovered: ${monitor.friendly_name}`;
       
       let message = `Status: ${getStatusText(currentStatus)}\n`;
       
-      // Add the latest log if available
+      
       if (monitor.logs && monitor.logs.length > 0) {
         const latestLog = monitor.logs[0];
         message += `At: ${formatTime(latestLog.datetime)}`;
@@ -171,15 +171,15 @@ async function checkMonitors() {
   };
 }
 
-// Handler for Vercel serverless function
+
 module.exports = async (req, res) => {
   try {
-    // Only allow GET requests
+    
     if (req.method !== 'GET') {
       return res.status(405).json({ error: 'Method not allowed' });
     }
     
-    // Allow manually triggering by query param for testing
+    
     const isCron = req.headers['x-vercel-cron'] === 'true';
     const isManualTrigger = req.query.trigger === 'manual';
     

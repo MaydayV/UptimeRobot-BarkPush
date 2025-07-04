@@ -89,13 +89,13 @@ module.exports = {
   barkServerUrl: 'https://api.day.app',
   barkDeviceKey: 'your_bark_device_key',
   cronSchedule: '*/5 * * * *',
-  // 可选配置
-  // monitorIds: ['m1234567', 'm7654321'],
-  // sendRecoveryNotifications: false,
-  // downNotificationSound: 'alert',
-  // recoveryNotificationSound: 'complete'
-  // sendStartupNotification: false,
-  // notificationLanguage: 'zh'
+  
+  
+  
+  
+  
+  
+  
 };
 ```
 

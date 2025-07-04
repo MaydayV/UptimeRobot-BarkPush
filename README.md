@@ -80,10 +80,10 @@ module.exports = {
   barkServerUrl: 'https://api.day.app',
   barkDeviceKey: 'your_bark_device_key',
   cronSchedule: '*/5 * * * *',
-  // Optional: monitorIds: ['m1234567', 'm7654321'],
-  // Optional: sendRecoveryNotifications: false,
-  // Optional: downNotificationSound: 'alert',
-  // Optional: recoveryNotificationSound: 'complete'
+  
+  
+  
+  
 };
 ```
 

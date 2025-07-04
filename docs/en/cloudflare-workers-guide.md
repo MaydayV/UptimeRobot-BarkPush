@@ -84,15 +84,15 @@ BARK_SERVER_URL = "https://api.day.app"
 Edit the `src/index.js` file to implement the monitoring logic:
 
 ```javascript
-// Monitor state cache (maintain state between calls)
+
 let monitorStateCache = {};
 
-// Format timestamp to readable string
+
 function formatTime(timestamp) {
   return new Date(timestamp * 1000).toLocaleString();
 }
 
-// Get status text
+
 function getStatusText(statusCode, language) {
   if (language === 'zh') {
     switch (statusCode) {
@@ -115,16 +115,16 @@ function getStatusText(statusCode, language) {
   }
 }
 
-// Get monitor status from UptimeRobot
+
 async function getMonitors(env) {
   try {
-    // Create form data
+    
     const formData = new URLSearchParams();
     formData.append('api_key', env.UPTIMEROBOT_API_KEY);
     formData.append('format', 'json');
     formData.append('logs', '1');
     
-    // Send POST request
+    
     const response = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
       method: 'POST',
       headers: {
@@ -142,7 +142,7 @@ async function getMonitors(env) {
       return [];
     }
     
-    // Filter results if specific monitor IDs are specified
+    
     if (env.MONITOR_IDS) {
       const monitorIds = env.MONITOR_IDS.split(',');
       return data.monitors.filter(monitor => monitorIds.includes(monitor.id.toString()));
@@ -155,26 +155,26 @@ async function getMonitors(env) {
   }
 }
 
-// Send Bark notification
+
 async function sendBarkNotification(env, title, message, url = '', sound = null) {
   try {
     console.log('Sending Bark notification...');
     
-    // Use POST request to send Bark notification
+    
     const postData = new URLSearchParams();
     postData.append('title', title);
     postData.append('body', message);
     
-    // Add optional parameters
+    
     if (url) postData.append('url', url);
     if (sound) postData.append('sound', sound);
     
-    // Add language grouping
+    
     if (env.NOTIFICATION_LANGUAGE) {
       postData.append('group', env.NOTIFICATION_LANGUAGE === 'zh' ? '网站监控' : 'Website Monitor');
     }
     
-    // Send POST request
+    
     const response = await fetch(`${env.BARK_SERVER_URL}/${env.BARK_DEVICE_KEY}`, {
       method: 'POST',
       headers: {
@@ -198,7 +198,7 @@ async function sendBarkNotification(env, title, message, url = '', sound = null)
   }
 }
 
-// Check monitors and send notifications
+
 async function checkMonitors(env) {
   console.log(`[${new Date().toISOString()}] Checking monitors...`);
   
@@ -215,16 +215,16 @@ async function checkMonitors(env) {
     const currentStatus = monitor.status;
     const prevStatus = monitorStateCache[monitor.id];
     
-    // Update cache
+    
     monitorStateCache[monitor.id] = currentStatus;
     
-    // If first check or status changed from up to down, send notification
+    
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
       const title = `🔴 Website Down: ${monitor.friendly_name}`;
       
       let message = `Status: ${getStatusText(currentStatus, env.NOTIFICATION_LANGUAGE)}\n`;
       
-      // Add latest log if available
+      
       if (monitor.logs && monitor.logs.length > 0) {
         const latestLog = monitor.logs[0];
         message += `Since: ${formatTime(latestLog.datetime)}\n`;
@@ -246,13 +246,13 @@ async function checkMonitors(env) {
       });
     }
     
-    // If status changed from down to up, send recovery notification if enabled
+    
     else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && env.SEND_RECOVERY_NOTIFICATIONS !== 'false') {
       const title = `🟢 Website Recovered: ${monitor.friendly_name}`;
       
       let message = `Status: ${getStatusText(currentStatus, env.NOTIFICATION_LANGUAGE)}\n`;
       
-      // Add latest log if available
+      
       if (monitor.logs && monitor.logs.length > 0) {
         const latestLog = monitor.logs[0];
         message += `At: ${formatTime(latestLog.datetime)}`;
@@ -286,13 +286,13 @@ async function checkMonitors(env) {
   };
 }
 
-// Worker entry point
+
 export default {
-  // Handle HTTP requests (for manual triggering and testing)
+  
   async fetch(request, env, ctx) {
-    // Send startup notification if enabled
+    
     if (env.SEND_STARTUP_NOTIFICATION !== 'false' && request.url.includes('startup=true')) {
-      // Choose notification content based on language setting
+      
       let title, message;
       
       if (env.NOTIFICATION_LANGUAGE === 'zh') {
@@ -313,7 +313,7 @@ export default {
     });
   },
   
-  // Handle scheduled events
+  
   async scheduled(event, env, ctx) {
     await checkMonitors(env);
     return new Response('OK');

@@ -83,15 +83,15 @@ BARK_SERVER_URL = "https://api.day.app"
 编辑 `src/index.js` 文件，实现监控逻辑：
 
 ```javascript
-// 监控状态缓存（在多次调用之间保持状态）
+
 let monitorStateCache = {};
 
-// 格式化时间戳为可读字符串
+
 function formatTime(timestamp) {
   return new Date(timestamp * 1000).toLocaleString();
 }
 
-// 获取监控状态文本
+
 function getStatusText(statusCode, language) {
   if (language === 'zh') {
     switch (statusCode) {
@@ -114,16 +114,16 @@ function getStatusText(statusCode, language) {
   }
 }
 
-// 从 UptimeRobot 获取监控状态
+
 async function getMonitors(env) {
   try {
-    // 创建表单数据
+    
     const formData = new URLSearchParams();
     formData.append('api_key', env.UPTIMEROBOT_API_KEY);
     formData.append('format', 'json');
     formData.append('logs', '1');
     
-    // 发送 POST 请求
+    
     const response = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
       method: 'POST',
       headers: {
@@ -141,7 +141,7 @@ async function getMonitors(env) {
       return [];
     }
     
-    // 如果指定了监控 ID，过滤结果
+    
     if (env.MONITOR_IDS) {
       const monitorIds = env.MONITOR_IDS.split(',');
       return data.monitors.filter(monitor => monitorIds.includes(monitor.id.toString()));
@@ -154,26 +154,26 @@ async function getMonitors(env) {
   }
 }
 
-// 发送 Bark 通知
+
 async function sendBarkNotification(env, title, message, url = '', sound = null) {
   try {
     console.log('Sending Bark notification...');
     
-    // 使用 POST 请求发送 Bark 通知
+    
     const postData = new URLSearchParams();
     postData.append('title', title);
     postData.append('body', message);
     
-    // 添加可选参数
+    
     if (url) postData.append('url', url);
     if (sound) postData.append('sound', sound);
     
-    // 添加语言分组
+    
     if (env.NOTIFICATION_LANGUAGE) {
       postData.append('group', env.NOTIFICATION_LANGUAGE === 'zh' ? '网站监控' : 'Website Monitor');
     }
     
-    // 发送 POST 请求
+    
     const response = await fetch(`${env.BARK_SERVER_URL}/${env.BARK_DEVICE_KEY}`, {
       method: 'POST',
       headers: {
@@ -197,7 +197,7 @@ async function sendBarkNotification(env, title, message, url = '', sound = null)
   }
 }
 
-// 检查监控并发送通知
+
 async function checkMonitors(env) {
   console.log(`[${new Date().toISOString()}] Checking monitors...`);
   
@@ -214,19 +214,19 @@ async function checkMonitors(env) {
     const currentStatus = monitor.status;
     const prevStatus = monitorStateCache[monitor.id];
     
-    // 更新缓存
+    
     monitorStateCache[monitor.id] = currentStatus;
     
-    // 如果是首次检查或状态从正常变为宕机，发送通知
+    
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
-      // 根据语言设置选择通知内容
+      
       let title, message;
       
       if (env.NOTIFICATION_LANGUAGE === 'zh') {
         title = `🔴 网站宕机: ${monitor.friendly_name}`;
         message = `状态: ${getStatusText(currentStatus, 'zh')}\n`;
         
-        // 添加最新日志（如果有）
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `时间: ${formatTime(latestLog.datetime)}\n`;
@@ -236,7 +236,7 @@ async function checkMonitors(env) {
         title = `🔴 Website Down: ${monitor.friendly_name}`;
         message = `Status: ${getStatusText(currentStatus, 'en')}\n`;
         
-        // 添加最新日志（如果有）
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `Since: ${formatTime(latestLog.datetime)}\n`;
@@ -259,16 +259,16 @@ async function checkMonitors(env) {
       });
     }
     
-    // 如果状态从宕机变为正常，发送恢复通知（如果启用）
+    
     else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && env.SEND_RECOVERY_NOTIFICATIONS !== 'false') {
-      // 根据语言设置选择通知内容
+      
       let title, message;
       
       if (env.NOTIFICATION_LANGUAGE === 'zh') {
         title = `🟢 网站恢复: ${monitor.friendly_name}`;
         message = `状态: ${getStatusText(currentStatus, 'zh')}\n`;
         
-        // 添加最新日志（如果有）
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `时间: ${formatTime(latestLog.datetime)}`;
@@ -277,7 +277,7 @@ async function checkMonitors(env) {
         title = `🟢 Website Recovered: ${monitor.friendly_name}`;
         message = `Status: ${getStatusText(currentStatus, 'en')}\n`;
         
-        // 添加最新日志（如果有）
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `At: ${formatTime(latestLog.datetime)}`;
@@ -312,13 +312,13 @@ async function checkMonitors(env) {
   };
 }
 
-// Worker 入口点
+
 export default {
-  // 处理 HTTP 请求（用于手动触发和测试）
+  
   async fetch(request, env, ctx) {
-    // 发送启动通知（如果启用）
+    
     if (env.SEND_STARTUP_NOTIFICATION !== 'false' && request.url.includes('startup=true')) {
-      // 根据语言设置选择通知内容
+      
       let title, message;
       
       if (env.NOTIFICATION_LANGUAGE === 'zh') {
@@ -339,7 +339,7 @@ export default {
     });
   },
   
-  // 处理定时触发
+  
   async scheduled(event, env, ctx) {
     await checkMonitors(env);
     return new Response('OK');

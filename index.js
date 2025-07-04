@@ -1,11 +1,11 @@
-// 添加dotenv支持
+
 require('dotenv').config();
 const axios = require('axios');
 const cron = require('node-cron');
-// Use a single configuration file that handles environment variables
+
 const config = require('./config');
 
-// Cache to track monitor states to avoid duplicate notifications
+
 const monitorStateCache = new Map();
 
 /**
@@ -26,22 +26,22 @@ async function getMonitors() {
     console.log('API Key Format Check:', apiKey.length > 10 ? 'Valid length' : 'Invalid length', 
                 'Starts with:', apiKey.substring(0, 2));
     
-    // 根据提供的 curl 示例，使用 POST 请求和表单编码
+    
     console.log('Using POST request to /v2/getMonitors endpoint with form-urlencoded data');
     
     try {
-      // 创建表单数据
+      
       const formData = new URLSearchParams();
       formData.append('api_key', apiKey);
       formData.append('format', 'json');
       formData.append('logs', '1');
       
-      // 如果指定了监控器 ID，添加到请求中
+      
       if (config.monitorIds && config.monitorIds.length > 0) {
         formData.append('monitors', config.monitorIds.join('-'));
       }
       
-      // 发送请求
+      
       const response = await axios.post(
         'https://api.uptimerobot.com/v2/getMonitors',
         formData.toString(),
@@ -58,7 +58,7 @@ async function getMonitors() {
       if (response.data && response.data.stat === 'ok' && Array.isArray(response.data.monitors)) {
         console.log('API call successful! Found', response.data.monitors.length, 'monitors');
         
-        // 返回监控器数据
+        
         return response.data.monitors;
       } else {
         console.error('Invalid response format:', JSON.stringify(response.data, null, 2));
@@ -70,7 +70,7 @@ async function getMonitors() {
         console.error('  Status Text:', error.response.statusText);
         console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
         
-        // 检查是否是认证问题
+        
         if (error.response.status === 401) {
           console.error('Authentication failed. Please check your API key.');
           console.error('Make sure you are using a valid API key with read access.');
@@ -93,21 +93,21 @@ async function sendBarkNotification(title, message, url = '', sound = null) {
   try {
     console.log('Sending Bark notification...');
     
-    // 使用 POST 请求发送 Bark 通知
+    
     const postData = new URLSearchParams();
     postData.append('title', title);
     postData.append('body', message);
     
-    // 添加可选参数
+    
     if (url) postData.append('url', url);
     if (sound) postData.append('sound', sound);
     
-    // 添加语言参数
+    
     if (config.notificationLanguage) {
       postData.append('group', config.notificationLanguage === 'zh' ? '网站监控' : 'Website Monitor');
     }
     
-    // 发送 POST 请求
+    
     const response = await axios.post(
       `${config.barkServerUrl}/${config.barkDeviceKey}`,
       postData.toString(),
@@ -177,19 +177,19 @@ async function checkMonitors() {
     const currentStatus = monitor.status;
     const prevStatus = monitorStateCache.get(monitor.id);
     
-    // Update the cache
+    
     monitorStateCache.set(monitor.id, currentStatus);
     
-    // If this is the first check or status changed to down, send notification
+    
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
-      // 根据语言设置选择通知内容
+      
       let title, message;
       
       if (config.notificationLanguage === 'zh') {
         title = `🔴 网站宕机: ${monitor.friendly_name}`;
         message = `状态: ${getStatusText(currentStatus)}\n`;
         
-        // Add the latest log if available
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `时间: ${formatTime(latestLog.datetime)}\n`;
@@ -199,7 +199,7 @@ async function checkMonitors() {
         title = `🔴 Website Down: ${monitor.friendly_name}`;
         message = `Status: ${getStatusText(currentStatus)}\n`;
         
-        // Add the latest log if available
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `Since: ${formatTime(latestLog.datetime)}\n`;
@@ -210,16 +210,16 @@ async function checkMonitors() {
       await sendBarkNotification(title, message, monitor.url, config.downNotificationSound);
     }
     
-    // If status changed from down to up, send recovery notification if enabled
+    
     else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && config.sendRecoveryNotifications) {
-      // 根据语言设置选择通知内容
+      
       let title, message;
       
       if (config.notificationLanguage === 'zh') {
         title = `🟢 网站恢复: ${monitor.friendly_name}`;
         message = `状态: ${getStatusText(currentStatus)}\n`;
         
-        // Add the latest log if available
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `时间: ${formatTime(latestLog.datetime)}`;
@@ -228,7 +228,7 @@ async function checkMonitors() {
         title = `🟢 Website Recovered: ${monitor.friendly_name}`;
         message = `Status: ${getStatusText(currentStatus)}\n`;
         
-        // Add the latest log if available
+        
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `At: ${formatTime(latestLog.datetime)}`;
@@ -246,9 +246,9 @@ async function checkMonitors() {
 function init() {
   console.log('UptimeRobot to Bark notification service starting...');
   
-  // 发送启动通知
+  
   if (config.sendStartupNotification) {
-    // 根据语言设置选择通知内容
+    
     let title, message;
     
     if (config.notificationLanguage === 'zh') {
@@ -263,14 +263,14 @@ function init() {
     console.log('Startup notification sent');
   }
   
-  // Check monitors immediately on startup
+  
   checkMonitors();
   
-  // Schedule regular checks
+  
   cron.schedule(config.cronSchedule, checkMonitors);
   
   console.log(`Monitoring scheduled: ${config.cronSchedule}`);
 }
 
-// Start the service
+
 init(); 
