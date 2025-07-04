@@ -26,34 +26,39 @@ async function getMonitors() {
     console.log('API Key Format Check:', apiKey.length > 10 ? 'Valid length' : 'Invalid length', 
                 'Starts with:', apiKey.substring(0, 2));
     
-    // 根据说明，只读 API 密钥应该使用 v2/getMonitors 端点
-    console.log('Using GET request to /v2/getMonitors endpoint with query parameters');
+    // 根据提供的 curl 示例，使用 POST 请求和表单编码
+    console.log('Using POST request to /v2/getMonitors endpoint with form-urlencoded data');
     
     try {
-      const response = await axios.get(`https://api.uptimerobot.com/v2/getMonitors`, {
-        params: {
-          api_key: apiKey,
-          format: 'json',
-          logs: 1
-        },
-        headers: {
-          'cache-control': 'no-cache'
+      // 创建表单数据
+      const formData = new URLSearchParams();
+      formData.append('api_key', apiKey);
+      formData.append('format', 'json');
+      formData.append('logs', '1');
+      
+      // 如果指定了监控器 ID，添加到请求中
+      if (config.monitorIds && config.monitorIds.length > 0) {
+        formData.append('monitors', config.monitorIds.join('-'));
+      }
+      
+      // 发送请求
+      const response = await axios.post(
+        'https://api.uptimerobot.com/v2/getMonitors',
+        formData.toString(),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cache-Control': 'no-cache'
+          }
         }
-      });
+      );
       
       console.log('API response received, checking format...');
       
       if (response.data && response.data.stat === 'ok' && Array.isArray(response.data.monitors)) {
         console.log('API call successful! Found', response.data.monitors.length, 'monitors');
         
-        // If specific monitor IDs are configured, filter the results
-        if (config.monitorIds && config.monitorIds.length > 0) {
-          const filteredMonitors = response.data.monitors.filter(monitor => 
-            config.monitorIds.includes(monitor.id.toString()));
-          console.log('Filtered to', filteredMonitors.length, 'specified monitors');
-          return filteredMonitors;
-        }
-        
+        // 返回监控器数据
         return response.data.monitors;
       } else {
         console.error('Invalid response format:', JSON.stringify(response.data, null, 2));
