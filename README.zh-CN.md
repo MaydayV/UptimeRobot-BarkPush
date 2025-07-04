@@ -63,6 +63,8 @@ BARK_DEVICE_KEY=您的设备密钥
 - `SEND_RECOVERY_NOTIFICATIONS`（可选）：设置为 'false' 可禁用恢复通知
 - `DOWN_NOTIFICATION_SOUND`（可选）：宕机通知的自定义声音
 - `RECOVERY_NOTIFICATION_SOUND`（可选）：恢复通知的自定义声音
+- `SEND_STARTUP_NOTIFICATION`（可选）：设置为 'false' 可禁用启动通知
+- `NOTIFICATION_LANGUAGE`（可选）：设置为 'zh' 使用中文或 'en' 使用英文（默认）
 
 #### 方式 B：配置文件
 
@@ -80,10 +82,13 @@ module.exports = {
   barkServerUrl: 'https://api.day.app',
   barkDeviceKey: 'your_bark_device_key',
   cronSchedule: '*/5 * * * *',
-  
-  
-  
-  
+  // 可选配置
+  // monitorIds: ['m1234567', 'm7654321'],
+  // sendRecoveryNotifications: false,
+  // downNotificationSound: 'alert',
+  // recoveryNotificationSound: 'complete',
+  // sendStartupNotification: true,
+  // notificationLanguage: 'zh'  // 使用 'en' 获取英文通知
 };
 ```
 

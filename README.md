@@ -63,6 +63,8 @@ Additional environment variables you can set:
 - `SEND_RECOVERY_NOTIFICATIONS` (optional): Set to 'false' to disable recovery notifications
 - `DOWN_NOTIFICATION_SOUND` (optional): Custom sound for down notifications
 - `RECOVERY_NOTIFICATION_SOUND` (optional): Custom sound for recovery notifications
+- `SEND_STARTUP_NOTIFICATION` (optional): Set to 'false' to disable startup notifications
+- `NOTIFICATION_LANGUAGE` (optional): Set to 'zh' for Chinese or 'en' for English (default)
 
 #### Option B: Config File
 
@@ -80,10 +82,13 @@ module.exports = {
   barkServerUrl: 'https://api.day.app',
   barkDeviceKey: 'your_bark_device_key',
   cronSchedule: '*/5 * * * *',
-  
-  
-  
-  
+  // Optional configuration
+  // monitorIds: ['m1234567', 'm7654321'],
+  // sendRecoveryNotifications: false,
+  // downNotificationSound: 'alert',
+  // recoveryNotificationSound: 'complete',
+  // sendStartupNotification: true,
+  // notificationLanguage: 'en'  // Use 'zh' for Chinese
 };
 ```
 
