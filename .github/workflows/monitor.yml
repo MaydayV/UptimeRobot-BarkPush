@@ -30,7 +30,9 @@ jobs:
             monitorIds: process.env.MONITOR_IDS ? process.env.MONITOR_IDS.split(',') : undefined,
             sendRecoveryNotifications: process.env.SEND_RECOVERY_NOTIFICATIONS !== 'false',
             downNotificationSound: process.env.DOWN_NOTIFICATION_SOUND || 'minuet',
-            recoveryNotificationSound: process.env.RECOVERY_NOTIFICATION_SOUND || 'electric'
+            recoveryNotificationSound: process.env.RECOVERY_NOTIFICATION_SOUND || 'electric',
+            sendStartupNotification: process.env.SEND_STARTUP_NOTIFICATION !== 'false',
+            notificationLanguage: process.env.NOTIFICATION_LANGUAGE || 'en'
           };
           EOL
         
@@ -43,4 +45,6 @@ jobs:
           MONITOR_IDS: ${{ secrets.MONITOR_IDS }}
           SEND_RECOVERY_NOTIFICATIONS: ${{ secrets.SEND_RECOVERY_NOTIFICATIONS }}
           DOWN_NOTIFICATION_SOUND: ${{ secrets.DOWN_NOTIFICATION_SOUND }}
-          RECOVERY_NOTIFICATION_SOUND: ${{ secrets.RECOVERY_NOTIFICATION_SOUND }} 
+          RECOVERY_NOTIFICATION_SOUND: ${{ secrets.RECOVERY_NOTIFICATION_SOUND }}
+          SEND_STARTUP_NOTIFICATION: ${{ secrets.SEND_STARTUP_NOTIFICATION }}
+          NOTIFICATION_LANGUAGE: ${{ secrets.NOTIFICATION_LANGUAGE }} 
