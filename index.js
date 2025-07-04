@@ -20,78 +20,103 @@ function formatTime(timestamp) {
  */
 async function getMonitors() {
   try {
-    console.log('Requesting monitors from UptimeRobot API...');
+    console.log('Requesting monitors from UptimeRobot API using read-only API key...');
     
-    // 首先尝试使用查询参数方式
     const apiKey = config.uptimeRobotApiKey;
     console.log('API Key Format Check:', apiKey.length > 10 ? 'Valid length' : 'Invalid length', 
                 'Starts with:', apiKey.substring(0, 2));
     
-    // 构建请求选项
-    const requestOptions = {
-      method: 'post',  // 使用 POST 方法
-      url: 'https://api.uptimerobot.com/v3/getMonitors',  // 使用 getMonitors 端点
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      },
-      data: {
-        api_key: apiKey,
-        format: 'json',
-        logs: 1
-      }
-    };
+    // 针对只读 API 密钥，使用 GET 请求
+    console.log('Using GET request to /v3/getMonitors endpoint (for read-only API key)');
     
-    console.log('Request URL:', requestOptions.url);
-    console.log('Request Method:', requestOptions.method);
-    
-    const response = await axios(requestOptions);
-
-    if (!response.data || response.data.stat !== 'ok' || !Array.isArray(response.data.monitors)) {
-      console.error('Invalid response from UptimeRobot API:', JSON.stringify(response.data, null, 2));
-      return [];
-    }
-
-    // If specific monitor IDs are configured, filter the results
-    if (config.monitorIds && config.monitorIds.length > 0) {
-      return response.data.monitors.filter(monitor => 
-        config.monitorIds.includes(monitor.id.toString()));
-    }
-
-    return response.data.monitors;
-  } catch (error) {
-    console.error('Failed to fetch monitors:', error.message);
-    if (error.response) {
-      console.error('API Error Details:');
-      console.error('  Status:', error.response.status);
-      console.error('  Status Text:', error.response.statusText);
-      console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
+    try {
+      const response = await axios.get('https://api.uptimerobot.com/v3/getMonitors', {
+        params: {
+          api_key: apiKey,
+          format: 'json',
+          logs: 1
+        },
+        headers: {
+          'cache-control': 'no-cache'
+        }
+      });
       
-      // 尝试另一种 API 调用方式
-      if (error.response.status === 401 || error.response.status === 404) {
-        console.log('Trying alternative API endpoint and method...');
-        try {
-          // 尝试 v2 API 格式
-          const altResponse = await axios.post('https://api.uptimerobot.com/getMonitors', 
-            `api_key=${config.uptimeRobotApiKey}&format=json&logs=1`, 
-            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-          );
+      if (response.data && response.data.stat === 'ok' && Array.isArray(response.data.monitors)) {
+        console.log('API call successful!');
+        
+        // If specific monitor IDs are configured, filter the results
+        if (config.monitorIds && config.monitorIds.length > 0) {
+          return response.data.monitors.filter(monitor => 
+            config.monitorIds.includes(monitor.id.toString()));
+        }
+        
+        return response.data.monitors;
+      } else {
+        console.error('Invalid response format:', JSON.stringify(response.data, null, 2));
+        
+        // 尝试第二种方法 - 使用 GET 请求和 monitors 端点
+        console.log('Trying GET request to /v3/monitors endpoint...');
+        const response2 = await axios.get('https://api.uptimerobot.com/v3/monitors', {
+          params: {
+            api_key: apiKey,
+            format: 'json',
+            logs: 1
+          },
+          headers: {
+            'cache-control': 'no-cache'
+          }
+        });
+        
+        if (response2.data && response2.data.stat === 'ok' && Array.isArray(response2.data.monitors)) {
+          console.log('Second attempt successful!');
           
-          if (altResponse.data && altResponse.data.stat === 'ok' && Array.isArray(altResponse.data.monitors)) {
-            console.log('Alternative API call successful!');
-            return altResponse.data.monitors;
-          } else {
-            console.error('Alternative API call failed:', JSON.stringify(altResponse.data, null, 2));
+          // If specific monitor IDs are configured, filter the results
+          if (config.monitorIds && config.monitorIds.length > 0) {
+            return response2.data.monitors.filter(monitor => 
+              config.monitorIds.includes(monitor.id.toString()));
           }
-        } catch (altError) {
-          console.error('Alternative API call error:', altError.message);
-          if (altError.response) {
-            console.error('  Alt Status:', altError.response.status);
-            console.error('  Alt Response:', JSON.stringify(altError.response.data, null, 2));
+          
+          return response2.data.monitors;
+        } else {
+          console.error('Second attempt - Invalid response format:', JSON.stringify(response2.data, null, 2));
+        }
+      }
+    } catch (error) {
+      console.error('API call failed:', error.message);
+      if (error.response) {
+        console.error('  Status:', error.response.status);
+        console.error('  Status Text:', error.response.statusText);
+        console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
+      }
+      
+      // 尝试 v2 API 格式 (不带 v3 路径)
+      try {
+        console.log('Trying v2 API format...');
+        const responseV2 = await axios.get('https://api.uptimerobot.com/getMonitors', {
+          params: {
+            apiKey: apiKey,
+            format: 'json',
+            logs: 1,
+            noJsonCallback: 1
           }
+        });
+        
+        if (responseV2.data && responseV2.data.monitors) {
+          console.log('v2 API call successful!');
+          return responseV2.data.monitors;
+        }
+      } catch (errorV2) {
+        console.error('v2 API call failed:', errorV2.message);
+        if (errorV2.response) {
+          console.error('  v2 Status:', errorV2.response.status);
+          console.error('  v2 Response:', JSON.stringify(errorV2.response.data, null, 2));
         }
       }
     }
+    
+    return [];
+  } catch (outerError) {
+    console.error('Failed to fetch monitors (outer):', outerError.message);
     return [];
   }
 }
