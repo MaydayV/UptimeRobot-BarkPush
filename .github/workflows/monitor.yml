@@ -19,6 +19,21 @@ jobs:
       - name: Install dependencies
         run: npm install
         
+      - name: Create config.js file
+        run: |
+          cat > config.js << 'EOL'
+          module.exports = {
+            uptimeRobotApiKey: process.env.UPTIMEROBOT_API_KEY,
+            barkServerUrl: process.env.BARK_SERVER_URL || 'https://api.day.app',
+            barkDeviceKey: process.env.BARK_DEVICE_KEY,
+            cronSchedule: '*/5 * * * *',
+            monitorIds: process.env.MONITOR_IDS ? process.env.MONITOR_IDS.split(',') : undefined,
+            sendRecoveryNotifications: process.env.SEND_RECOVERY_NOTIFICATIONS !== 'false',
+            downNotificationSound: process.env.DOWN_NOTIFICATION_SOUND || 'minuet',
+            recoveryNotificationSound: process.env.RECOVERY_NOTIFICATION_SOUND || 'electric'
+          };
+          EOL
+        
       - name: Run website check
         run: node index.js
         env:
