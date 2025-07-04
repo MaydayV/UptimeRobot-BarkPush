@@ -26,11 +26,11 @@ async function getMonitors() {
     console.log('API Key Format Check:', apiKey.length > 10 ? 'Valid length' : 'Invalid length', 
                 'Starts with:', apiKey.substring(0, 2));
     
-    // 针对只读 API 密钥，使用 GET 请求
-    console.log('Using GET request to /v3/getMonitors endpoint (for read-only API key)');
+    // 根据说明，只读 API 密钥应该使用 v2/getMonitors 端点
+    console.log('Using GET request to /v2/getMonitors endpoint with query parameters');
     
     try {
-      const response = await axios.get('https://api.uptimerobot.com/v3/getMonitors', {
+      const response = await axios.get(`https://api.uptimerobot.com/v2/getMonitors`, {
         params: {
           api_key: apiKey,
           format: 'json',
@@ -41,45 +41,22 @@ async function getMonitors() {
         }
       });
       
+      console.log('API response received, checking format...');
+      
       if (response.data && response.data.stat === 'ok' && Array.isArray(response.data.monitors)) {
-        console.log('API call successful!');
+        console.log('API call successful! Found', response.data.monitors.length, 'monitors');
         
         // If specific monitor IDs are configured, filter the results
         if (config.monitorIds && config.monitorIds.length > 0) {
-          return response.data.monitors.filter(monitor => 
+          const filteredMonitors = response.data.monitors.filter(monitor => 
             config.monitorIds.includes(monitor.id.toString()));
+          console.log('Filtered to', filteredMonitors.length, 'specified monitors');
+          return filteredMonitors;
         }
         
         return response.data.monitors;
       } else {
         console.error('Invalid response format:', JSON.stringify(response.data, null, 2));
-        
-        // 尝试第二种方法 - 使用 GET 请求和 monitors 端点
-        console.log('Trying GET request to /v3/monitors endpoint...');
-        const response2 = await axios.get('https://api.uptimerobot.com/v3/monitors', {
-          params: {
-            api_key: apiKey,
-            format: 'json',
-            logs: 1
-          },
-          headers: {
-            'cache-control': 'no-cache'
-          }
-        });
-        
-        if (response2.data && response2.data.stat === 'ok' && Array.isArray(response2.data.monitors)) {
-          console.log('Second attempt successful!');
-          
-          // If specific monitor IDs are configured, filter the results
-          if (config.monitorIds && config.monitorIds.length > 0) {
-            return response2.data.monitors.filter(monitor => 
-              config.monitorIds.includes(monitor.id.toString()));
-          }
-          
-          return response2.data.monitors;
-        } else {
-          console.error('Second attempt - Invalid response format:', JSON.stringify(response2.data, null, 2));
-        }
       }
     } catch (error) {
       console.error('API call failed:', error.message);
@@ -87,29 +64,12 @@ async function getMonitors() {
         console.error('  Status:', error.response.status);
         console.error('  Status Text:', error.response.statusText);
         console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
-      }
-      
-      // 尝试 v2 API 格式 (不带 v3 路径)
-      try {
-        console.log('Trying v2 API format...');
-        const responseV2 = await axios.get('https://api.uptimerobot.com/getMonitors', {
-          params: {
-            apiKey: apiKey,
-            format: 'json',
-            logs: 1,
-            noJsonCallback: 1
-          }
-        });
         
-        if (responseV2.data && responseV2.data.monitors) {
-          console.log('v2 API call successful!');
-          return responseV2.data.monitors;
-        }
-      } catch (errorV2) {
-        console.error('v2 API call failed:', errorV2.message);
-        if (errorV2.response) {
-          console.error('  v2 Status:', errorV2.response.status);
-          console.error('  v2 Response:', JSON.stringify(errorV2.response.data, null, 2));
+        // 检查是否是认证问题
+        if (error.response.status === 401) {
+          console.error('Authentication failed. Please check your API key.');
+          console.error('Make sure you are using a valid API key with read access.');
+          console.error('API keys can be found at: https://uptimerobot.com/ > My Settings > API Settings');
         }
       }
     }
