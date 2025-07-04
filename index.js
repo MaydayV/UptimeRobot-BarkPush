@@ -22,19 +22,30 @@ async function getMonitors() {
   try {
     console.log('Requesting monitors from UptimeRobot API...');
     
-    const response = await axios({
-      method: 'get',
-      url: 'https://api.uptimerobot.com/v3/monitors',
+    // 首先尝试使用查询参数方式
+    const apiKey = config.uptimeRobotApiKey;
+    console.log('API Key Format Check:', apiKey.length > 10 ? 'Valid length' : 'Invalid length', 
+                'Starts with:', apiKey.substring(0, 2));
+    
+    // 构建请求选项
+    const requestOptions = {
+      method: 'post',  // 使用 POST 方法
+      url: 'https://api.uptimerobot.com/v3/getMonitors',  // 使用 getMonitors 端点
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache'
       },
-      params: {
-        api_key: config.uptimeRobotApiKey,
+      data: {
+        api_key: apiKey,
         format: 'json',
-        logs: '1'
+        logs: 1
       }
-    });
+    };
+    
+    console.log('Request URL:', requestOptions.url);
+    console.log('Request Method:', requestOptions.method);
+    
+    const response = await axios(requestOptions);
 
     if (!response.data || response.data.stat !== 'ok' || !Array.isArray(response.data.monitors)) {
       console.error('Invalid response from UptimeRobot API:', JSON.stringify(response.data, null, 2));
@@ -55,8 +66,31 @@ async function getMonitors() {
       console.error('  Status:', error.response.status);
       console.error('  Status Text:', error.response.statusText);
       console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
-      console.error('  Request URL:', 'https://api.uptimerobot.com/v3/monitors');
-      console.error('  API Key (last 5):', '***' + config.uptimeRobotApiKey.slice(-5));
+      
+      // 尝试另一种 API 调用方式
+      if (error.response.status === 401 || error.response.status === 404) {
+        console.log('Trying alternative API endpoint and method...');
+        try {
+          // 尝试 v2 API 格式
+          const altResponse = await axios.post('https://api.uptimerobot.com/getMonitors', 
+            `api_key=${config.uptimeRobotApiKey}&format=json&logs=1`, 
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+          );
+          
+          if (altResponse.data && altResponse.data.stat === 'ok' && Array.isArray(altResponse.data.monitors)) {
+            console.log('Alternative API call successful!');
+            return altResponse.data.monitors;
+          } else {
+            console.error('Alternative API call failed:', JSON.stringify(altResponse.data, null, 2));
+          }
+        } catch (altError) {
+          console.error('Alternative API call error:', altError.message);
+          if (altError.response) {
+            console.error('  Alt Status:', altError.response.status);
+            console.error('  Alt Response:', JSON.stringify(altError.response.data, null, 2));
+          }
+        }
+      }
     }
     return [];
   }
