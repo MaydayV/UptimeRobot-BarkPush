@@ -9,7 +9,7 @@ A service that monitors website availability using UptimeRobot API (V3) and send
 - Monitors websites using UptimeRobot API
 - Sends notifications to your iOS devices via Bark when websites go down
 - Sends recovery notifications when websites come back online (configurable)
-- Can be run as a standalone service or deployed to Vercel
+- Can be run as a standalone service or deployed to various platforms
 - Configurable monitoring schedule
 - Filter monitoring to specific websites
 - Fully configurable via environment variables - no code changes needed
@@ -42,23 +42,27 @@ You have two options for configuration:
 
 #### Option A: Environment Variables (Recommended)
 
-Set the following environment variables:
+Create a `.env` file by copying the provided example:
 
-- `UPTIMEROBOT_API_KEY`: Your UptimeRobot API key
-- `BARK_DEVICE_KEY`: Your Bark device key
+```bash
+cp .env.example .env
+```
+
+Then edit the `.env` file with your values:
+
+```
+UPTIMEROBOT_API_KEY=your_api_key
+BARK_DEVICE_KEY=your_device_key
+```
+
+Additional environment variables you can set:
+
 - `BARK_SERVER_URL` (optional): Custom Bark server URL (default: https://api.day.app)
 - `CRON_SCHEDULE` (optional): Custom check schedule (default: */5 * * * *)
 - `MONITOR_IDS` (optional): Comma-separated list of monitor IDs to check
 - `SEND_RECOVERY_NOTIFICATIONS` (optional): Set to 'false' to disable recovery notifications
 - `DOWN_NOTIFICATION_SOUND` (optional): Custom sound for down notifications
 - `RECOVERY_NOTIFICATION_SOUND` (optional): Custom sound for recovery notifications
-
-Example:
-```bash
-export UPTIMEROBOT_API_KEY=your_api_key
-export BARK_DEVICE_KEY=your_device_key
-export SEND_RECOVERY_NOTIFICATIONS=false
-```
 
 #### Option B: Config File
 
@@ -106,6 +110,10 @@ docker run -e UPTIMEROBOT_API_KEY=your_key -e BARK_DEVICE_KEY=your_key uptimerob
 
 ### Deploy to Vercel
 
+> **Note**: Vercel's free plan (Hobby) only supports running cron jobs once per day, which is not frequent enough for website monitoring. Consider using one of the alternatives below.
+
+If you have a Vercel Pro plan:
+
 1. Push your repository to GitHub
 2. Create a new project on Vercel and connect it to your GitHub repository
 3. Add the following environment variables in Vercel:
@@ -116,14 +124,40 @@ docker run -e UPTIMEROBOT_API_KEY=your_key -e BARK_DEVICE_KEY=your_key uptimerob
 
 4. Deploy the project
 
-The Vercel cron job will run every 5 minutes to check your websites.
+## Free Alternatives
+
+If you don't have a Vercel Pro plan, consider these free alternatives:
+
+### 1. Using GitHub Actions
+
+GitHub Actions can run scheduled workflows for free, as frequently as every 5 minutes.
+
+[📖 Detailed GitHub Actions Deployment Guide](docs/en/github-actions-guide.md)
+
+### 2. Using Cloudflare Workers
+
+Cloudflare Workers has a free plan that allows Cron Triggers:
+
+[📖 Detailed Cloudflare Workers Deployment Guide](docs/en/cloudflare-workers-guide.md)
+
+### 3. Using Render.com
+
+Render offers free cron jobs that can be set to run multiple times per hour:
+
+[📖 Detailed Render.com Deployment Guide](docs/en/render-guide.md)
+
+### 4. Self-hosting
+
+If you have a computer or server that's always online, you can run this service using Docker:
+
+[📖 Detailed Self-hosting Guide](docs/en/self-hosting-guide.md)
 
 ## Testing
 
-You can manually trigger a check by accessing the API endpoint with a `trigger=manual` query parameter:
+You can test the service by running the code manually:
 
-```
-https://your-vercel-deployment.vercel.app/api/cron?trigger=manual
+```bash
+node index.js
 ```
 
 ## How it works

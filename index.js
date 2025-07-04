@@ -1,3 +1,5 @@
+// 添加dotenv支持
+require('dotenv').config();
 const axios = require('axios');
 const cron = require('node-cron');
 // Use a single configuration file that handles environment variables
@@ -32,8 +34,8 @@ async function getMonitors() {
       }
     });
 
-    if (response.data.stat !== 'ok') {
-      console.error('Error from UptimeRobot API:', response.data);
+    if (!response.data || response.data.stat !== 'ok' || !Array.isArray(response.data.monitors)) {
+      console.error('Invalid response from UptimeRobot API:', response.data);
       return [];
     }
 

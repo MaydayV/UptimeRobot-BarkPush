@@ -11,9 +11,10 @@ services:
     # Option 2: Use environment variables (recommended)
     environment:
       - NODE_ENV=production
-      - UPTIMEROBOT_API_KEY=your_api_key
-      - BARK_DEVICE_KEY=your_device_key
-      - BARK_SERVER_URL=https://api.day.app
+      # 这些环境变量应该在实际部署时在.env文件中设置，而不是直接在此处
+      # - UPTIMEROBOT_API_KEY=your_api_key
+      # - BARK_DEVICE_KEY=your_device_key
+      # - BARK_SERVER_URL=https://api.day.app
       # Optional: Specify specific monitors to check
       # - MONITOR_IDS=m1234567,m7654321
       # Optional: Custom checking schedule
@@ -24,6 +25,6 @@ services:
       # - DOWN_NOTIFICATION_SOUND=alert
       # - RECOVERY_NOTIFICATION_SOUND=complete
     
-    # For security, you can use an env file instead of specifying values here
-    # env_file:
-    #   - .env 
+    # 为了安全，强烈建议使用env文件来存储敏感信息
+    env_file:
+      - .env 

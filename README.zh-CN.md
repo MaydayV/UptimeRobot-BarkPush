@@ -9,7 +9,7 @@
 - 使用 UptimeRobot API 监控网站状态
 - 在网站宕机时通过 Bark 向 iOS 设备发送通知
 - 在网站恢复时发送恢复通知（可配置）
-- 可作为独立服务运行或部署到 Vercel
+- 可作为独立服务运行或部署到多种平台
 - 可配置的监控时间表
 - 可选择监控特定网站
 - 完全通过环境变量配置 - 无需更改代码
@@ -42,23 +42,27 @@ npm install
 
 #### 方式 A：环境变量（推荐）
 
-设置以下环境变量：
+通过复制提供的示例创建 `.env` 文件：
 
-- `UPTIMEROBOT_API_KEY`：您的 UptimeRobot API 密钥
-- `BARK_DEVICE_KEY`：您的 Bark 设备密钥
+```bash
+cp .env.example .env
+```
+
+然后编辑 `.env` 文件，填入您的值：
+
+```
+UPTIMEROBOT_API_KEY=您的API密钥
+BARK_DEVICE_KEY=您的设备密钥
+```
+
+您可以设置的其他环境变量：
+
 - `BARK_SERVER_URL`（可选）：自定义 Bark 服务器 URL（默认：https://api.day.app）
 - `CRON_SCHEDULE`（可选）：自定义检查时间表（默认：*/5 * * * *）
 - `MONITOR_IDS`（可选）：要检查的监控 ID 列表，以逗号分隔
 - `SEND_RECOVERY_NOTIFICATIONS`（可选）：设置为 'false' 可禁用恢复通知
 - `DOWN_NOTIFICATION_SOUND`（可选）：宕机通知的自定义声音
 - `RECOVERY_NOTIFICATION_SOUND`（可选）：恢复通知的自定义声音
-
-示例：
-```bash
-export UPTIMEROBOT_API_KEY=your_api_key
-export BARK_DEVICE_KEY=your_device_key
-export SEND_RECOVERY_NOTIFICATIONS=false
-```
 
 #### 方式 B：配置文件
 
@@ -106,6 +110,10 @@ docker run -e UPTIMEROBOT_API_KEY=your_key -e BARK_DEVICE_KEY=your_key uptimerob
 
 ### 部署到 Vercel
 
+> **注意**: Vercel 的免费计划 (Hobby) 仅支持每天运行一次 cron 作业，这对于网站监控来说不够频繁。建议使用以下替代方案之一。
+
+如果您有 Vercel Pro 计划：
+
 1. 将您的仓库推送到 GitHub
 2. 在 Vercel 上创建一个新项目并连接到您的 GitHub 仓库
 3. 在 Vercel 中添加以下环境变量：
@@ -116,14 +124,40 @@ docker run -e UPTIMEROBOT_API_KEY=your_key -e BARK_DEVICE_KEY=your_key uptimerob
 
 4. 部署项目
 
-Vercel 的 cron 作业将每 5 分钟运行一次以检查您的网站。
+## 免费替代方案
+
+如果您没有 Vercel Pro 计划，可以考虑以下免费替代方案：
+
+### 1. 使用 GitHub Actions
+
+GitHub Actions 可以免费运行定时工作流程，最频繁可以每 5 分钟运行一次。
+
+[📖 详细的 GitHub Actions 部署指南](docs/zh/github-actions-guide.md)
+
+### 2. 使用 Cloudflare Workers
+
+Cloudflare Workers 有一个免费计划，允许使用 Cron Triggers：
+
+[📖 详细的 Cloudflare Workers 部署指南](docs/zh/cloudflare-workers-guide.md)
+
+### 3. 使用 Render.com
+
+Render 提供免费的 cron jobs，可以设置为每小时运行多次：
+
+[📖 详细的 Render.com 部署指南](docs/zh/render-guide.md)
+
+### 4. 使用自托管方式
+
+如果您有一台始终在线的计算机或服务器，可以使用 Docker 在那里运行此服务：
+
+[📖 详细的自托管部署指南](docs/zh/self-hosting-guide.md)
 
 ## 测试
 
-您可以通过访问带有 `trigger=manual` 查询参数的 API 端点手动触发检查：
+您可以通过手动运行代码来测试服务：
 
-```
-https://your-vercel-deployment.vercel.app/api/cron?trigger=manual
+```bash
+node index.js
 ```
 
 ## 工作原理
