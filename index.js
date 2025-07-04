@@ -20,22 +20,25 @@ function formatTime(timestamp) {
  */
 async function getMonitors() {
   try {
+    console.log('Requesting monitors from UptimeRobot API...');
+    
+    // 使用 POST 请求和更简单的参数结构
     const response = await axios({
-      method: 'get',
-      url: 'https://api.uptimerobot.com/v3/monitors',
+      method: 'post',
+      url: 'https://api.uptimerobot.com/v3/getMonitors',
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache'
       },
-      params: {
+      data: {
         api_key: config.uptimeRobotApiKey,
         format: 'json',
-        logs: 1
+        logs: '1'
       }
     });
 
     if (!response.data || response.data.stat !== 'ok' || !Array.isArray(response.data.monitors)) {
-      console.error('Invalid response from UptimeRobot API:', response.data);
+      console.error('Invalid response from UptimeRobot API:', JSON.stringify(response.data, null, 2));
       return [];
     }
 
@@ -48,6 +51,14 @@ async function getMonitors() {
     return response.data.monitors;
   } catch (error) {
     console.error('Failed to fetch monitors:', error.message);
+    if (error.response) {
+      console.error('API Error Details:');
+      console.error('  Status:', error.response.status);
+      console.error('  Status Text:', error.response.statusText);
+      console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
+      console.error('  Request URL:', 'https://api.uptimerobot.com/v3/getMonitors');
+      console.error('  API Key (last 5):', '***' + config.uptimeRobotApiKey.slice(-5));
+    }
     return [];
   }
 }
