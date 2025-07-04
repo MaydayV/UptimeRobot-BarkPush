@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-A service that monitors website availability using UptimeRobot API (V3) and sends notifications via Bark when websites go down.
+A service that monitors website availability using UptimeRobot API and sends notifications via Bark when websites go down.
 
 ## Features
 

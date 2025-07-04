@@ -4,27 +4,7 @@ services:
   uptime-monitor:
     build: .
     restart: unless-stopped
-    # Option 1: Mount config.js file (make a copy from config.example.js)
-    # volumes:
-    #   - ./config.js:/app/config.js:ro
-    
-    # Option 2: Use environment variables (recommended)
     environment:
       - NODE_ENV=production
-      # 这些环境变量应该在实际部署时在.env文件中设置，而不是直接在此处
-      # - UPTIMEROBOT_API_KEY=your_api_key
-      # - BARK_DEVICE_KEY=your_device_key
-      # - BARK_SERVER_URL=https://api.day.app
-      # Optional: Specify specific monitors to check
-      # - MONITOR_IDS=m1234567,m7654321
-      # Optional: Custom checking schedule
-      # - CRON_SCHEDULE=*/10 * * * *
-      # Optional: Control recovery notifications (true/false)
-      # - SEND_RECOVERY_NOTIFICATIONS=false
-      # Optional: Custom notification sounds
-      # - DOWN_NOTIFICATION_SOUND=alert
-      # - RECOVERY_NOTIFICATION_SOUND=complete
-    
-    # 为了安全，强烈建议使用env文件来存储敏感信息
     env_file:
       - .env 

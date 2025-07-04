@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-一个使用 UptimeRobot API (V3) 监控网站可用性，并在网站宕机时通过 Bark 发送通知的服务。
+一个使用 UptimeRobot API 监控网站可用性，并在网站宕机时通过 Bark 发送通知的服务。
 
 ## 功能特点
 
