@@ -22,15 +22,14 @@ async function getMonitors() {
   try {
     console.log('Requesting monitors from UptimeRobot API...');
     
-    // 使用 POST 请求和更简单的参数结构
     const response = await axios({
-      method: 'post',
-      url: 'https://api.uptimerobot.com/v3/getMonitors',
+      method: 'get',
+      url: 'https://api.uptimerobot.com/v3/monitors',
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache'
       },
-      data: {
+      params: {
         api_key: config.uptimeRobotApiKey,
         format: 'json',
         logs: '1'
@@ -56,7 +55,7 @@ async function getMonitors() {
       console.error('  Status:', error.response.status);
       console.error('  Status Text:', error.response.statusText);
       console.error('  Response Data:', JSON.stringify(error.response.data, null, 2));
-      console.error('  Request URL:', 'https://api.uptimerobot.com/v3/getMonitors');
+      console.error('  Request URL:', 'https://api.uptimerobot.com/v3/monitors');
       console.error('  API Key (last 5):', '***' + config.uptimeRobotApiKey.slice(-5));
     }
     return [];
