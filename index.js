@@ -91,17 +91,32 @@ async function getMonitors() {
  */
 async function sendBarkNotification(title, message, url = '', sound = null) {
   try {
-    const encodedTitle = encodeURIComponent(title);
-    const encodedMessage = encodeURIComponent(message);
-    const barkUrl = `${config.barkServerUrl}/${config.barkDeviceKey}/${encodedTitle}/${encodedMessage}`;
+    console.log('Sending Bark notification...');
     
-    const params = new URLSearchParams();
-    if (url) params.append('url', url);
-    if (sound) params.append('sound', sound);
+    // 使用 POST 请求发送 Bark 通知
+    const postData = new URLSearchParams();
+    postData.append('title', title);
+    postData.append('body', message);
     
-    const finalUrl = params.toString() ? `${barkUrl}?${params.toString()}` : barkUrl;
+    // 添加可选参数
+    if (url) postData.append('url', url);
+    if (sound) postData.append('sound', sound);
     
-    const response = await axios.get(finalUrl);
+    // 添加语言参数
+    if (config.notificationLanguage) {
+      postData.append('group', config.notificationLanguage === 'zh' ? '网站监控' : 'Website Monitor');
+    }
+    
+    // 发送 POST 请求
+    const response = await axios.post(
+      `${config.barkServerUrl}/${config.barkDeviceKey}`,
+      postData.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
     
     if (response.data.code === 200) {
       console.log(`Notification sent: ${title}`);
@@ -112,6 +127,10 @@ async function sendBarkNotification(title, message, url = '', sound = null) {
     }
   } catch (error) {
     console.error('Failed to send Bark notification:', error.message);
+    if (error.response) {
+      console.error('  Status:', error.response.status);
+      console.error('  Response:', JSON.stringify(error.response.data, null, 2));
+    }
     return false;
   }
 }
@@ -120,13 +139,24 @@ async function sendBarkNotification(title, message, url = '', sound = null) {
  * Get the status text for a monitor
  */
 function getStatusText(statusCode) {
-  switch (statusCode) {
-    case 0: return 'Paused';
-    case 1: return 'Not checked yet';
-    case 2: return 'Up';
-    case 8: return 'Seems Down';
-    case 9: return 'Down';
-    default: return 'Unknown';
+  if (config.notificationLanguage === 'zh') {
+    switch (statusCode) {
+      case 0: return '已暂停';
+      case 1: return '未检查';
+      case 2: return '正常';
+      case 8: return '似乎宕机';
+      case 9: return '宕机';
+      default: return '未知';
+    }
+  } else {
+    switch (statusCode) {
+      case 0: return 'Paused';
+      case 1: return 'Not checked yet';
+      case 2: return 'Up';
+      case 8: return 'Seems Down';
+      case 9: return 'Down';
+      default: return 'Unknown';
+    }
   }
 }
 
@@ -152,15 +182,29 @@ async function checkMonitors() {
     
     // If this is the first check or status changed to down, send notification
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
-      const title = `🔴 Website Down: ${monitor.friendly_name}`;
+      // 根据语言设置选择通知内容
+      let title, message;
       
-      let message = `Status: ${getStatusText(currentStatus)}\n`;
-      
-      // Add the latest log if available
-      if (monitor.logs && monitor.logs.length > 0) {
-        const latestLog = monitor.logs[0];
-        message += `Since: ${formatTime(latestLog.datetime)}\n`;
-        message += `Reason: ${latestLog.reason.success || latestLog.reason.error || 'Unknown'}`;
+      if (config.notificationLanguage === 'zh') {
+        title = `🔴 网站宕机: ${monitor.friendly_name}`;
+        message = `状态: ${getStatusText(currentStatus)}\n`;
+        
+        // Add the latest log if available
+        if (monitor.logs && monitor.logs.length > 0) {
+          const latestLog = monitor.logs[0];
+          message += `时间: ${formatTime(latestLog.datetime)}\n`;
+          message += `原因: ${latestLog.reason.success || latestLog.reason.error || '未知'}`;
+        }
+      } else {
+        title = `🔴 Website Down: ${monitor.friendly_name}`;
+        message = `Status: ${getStatusText(currentStatus)}\n`;
+        
+        // Add the latest log if available
+        if (monitor.logs && monitor.logs.length > 0) {
+          const latestLog = monitor.logs[0];
+          message += `Since: ${formatTime(latestLog.datetime)}\n`;
+          message += `Reason: ${latestLog.reason.success || latestLog.reason.error || 'Unknown'}`;
+        }
       }
       
       await sendBarkNotification(title, message, monitor.url, config.downNotificationSound);
@@ -168,14 +212,27 @@ async function checkMonitors() {
     
     // If status changed from down to up, send recovery notification if enabled
     else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && config.sendRecoveryNotifications) {
-      const title = `🟢 Website Recovered: ${monitor.friendly_name}`;
+      // 根据语言设置选择通知内容
+      let title, message;
       
-      let message = `Status: ${getStatusText(currentStatus)}\n`;
-      
-      // Add the latest log if available
-      if (monitor.logs && monitor.logs.length > 0) {
-        const latestLog = monitor.logs[0];
-        message += `At: ${formatTime(latestLog.datetime)}`;
+      if (config.notificationLanguage === 'zh') {
+        title = `🟢 网站恢复: ${monitor.friendly_name}`;
+        message = `状态: ${getStatusText(currentStatus)}\n`;
+        
+        // Add the latest log if available
+        if (monitor.logs && monitor.logs.length > 0) {
+          const latestLog = monitor.logs[0];
+          message += `时间: ${formatTime(latestLog.datetime)}`;
+        }
+      } else {
+        title = `🟢 Website Recovered: ${monitor.friendly_name}`;
+        message = `Status: ${getStatusText(currentStatus)}\n`;
+        
+        // Add the latest log if available
+        if (monitor.logs && monitor.logs.length > 0) {
+          const latestLog = monitor.logs[0];
+          message += `At: ${formatTime(latestLog.datetime)}`;
+        }
       }
       
       await sendBarkNotification(title, message, monitor.url, config.recoveryNotificationSound);
@@ -188,6 +245,23 @@ async function checkMonitors() {
  */
 function init() {
   console.log('UptimeRobot to Bark notification service starting...');
+  
+  // 发送启动通知
+  if (config.sendStartupNotification) {
+    // 根据语言设置选择通知内容
+    let title, message;
+    
+    if (config.notificationLanguage === 'zh') {
+      title = '🚀 网站监控服务已启动';
+      message = `监控服务已成功启动\n监控频率: ${config.cronSchedule}\n监控数量: ${config.monitorIds ? config.monitorIds.length : '全部'}`;
+    } else {
+      title = '🚀 Website Monitoring Started';
+      message = `Monitoring service has started successfully\nSchedule: ${config.cronSchedule}\nMonitors: ${config.monitorIds ? config.monitorIds.length : 'All'}`;
+    }
+    
+    sendBarkNotification(title, message, '', 'active');
+    console.log('Startup notification sent');
+  }
   
   // Check monitors immediately on startup
   checkMonitors();

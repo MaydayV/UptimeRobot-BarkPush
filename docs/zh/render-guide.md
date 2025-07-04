@@ -44,6 +44,8 @@
 - `SEND_RECOVERY_NOTIFICATIONS`(可选): 设置为 'false' 以禁用恢复通知
 - `DOWN_NOTIFICATION_SOUND`(可选): 自定义宕机通知声音
 - `RECOVERY_NOTIFICATION_SOUND`(可选): 自定义恢复通知声音
+- `SEND_STARTUP_NOTIFICATION`(可选): 设置为 'false' 以禁用启动通知
+- `NOTIFICATION_LANGUAGE`(可选): 设置为 'zh' 使用中文或 'en' 使用英文（默认）
 
 ### 5. 创建服务
 
@@ -93,4 +95,21 @@ Render.com 免费计划有以下限制：
 - 有限的系统资源
 - 如果长时间不活动，服务可能会休眠
 
-更多信息，请参阅 [Render.com 文档](https://render.com/docs)。 
+更多信息，请参阅 [Render.com 文档](https://render.com/docs)。
+
+## 新功能
+
+### 启动通知
+
+服务可以在启动时发送通知，确认您的监控系统已激活。此功能默认启用。
+
+- 要禁用启动通知，请将 `SEND_STARTUP_NOTIFICATION` 环境变量设置为 'false'
+- 启用后，每次服务启动时您都会收到通知
+
+### 多语言支持
+
+通知可以以中文或英文显示：
+
+- 将 `NOTIFICATION_LANGUAGE` 环境变量设置为 'zh' 使用中文或 'en' 使用英文（默认）
+- 这会影响所有通知内容，包括启动、宕机和恢复消息
+- 语言设置适用于通知标题和正文 

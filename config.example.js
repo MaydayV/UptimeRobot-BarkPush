@@ -36,5 +36,14 @@ module.exports = {
   
   // Optional: Custom notification sound for recovery alerts
   // Can be set with RECOVERY_NOTIFICATION_SOUND environment variable
-  recoveryNotificationSound: process.env.RECOVERY_NOTIFICATION_SOUND || 'complete'
+  recoveryNotificationSound: process.env.RECOVERY_NOTIFICATION_SOUND || 'complete',
+
+  // Whether to send a test notification when the service starts
+  // Default: true (send startup notification)
+  // Can be set with SEND_STARTUP_NOTIFICATION environment variable ('true' or 'false')
+  sendStartupNotification: process.env.SEND_STARTUP_NOTIFICATION !== 'false',
+
+  // Language for notifications ('en' for English, 'zh' for Chinese)
+  // Can be set with NOTIFICATION_LANGUAGE environment variable
+  notificationLanguage: process.env.NOTIFICATION_LANGUAGE || 'en'
 }; 

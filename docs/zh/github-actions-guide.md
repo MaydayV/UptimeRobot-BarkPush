@@ -67,6 +67,8 @@ jobs:
           SEND_RECOVERY_NOTIFICATIONS: ${{ secrets.SEND_RECOVERY_NOTIFICATIONS }}
           DOWN_NOTIFICATION_SOUND: ${{ secrets.DOWN_NOTIFICATION_SOUND }}
           RECOVERY_NOTIFICATION_SOUND: ${{ secrets.RECOVERY_NOTIFICATION_SOUND }}
+          SEND_STARTUP_NOTIFICATION: ${{ secrets.SEND_STARTUP_NOTIFICATION }}
+          NOTIFICATION_LANGUAGE: ${{ secrets.NOTIFICATION_LANGUAGE }}
 ```
 
 ### 4. 添加 Secrets
@@ -82,6 +84,8 @@ jobs:
    - `SEND_RECOVERY_NOTIFICATIONS` (可选): 设置为 'false' 以禁用恢复通知
    - `DOWN_NOTIFICATION_SOUND` (可选): 自定义宕机通知声音
    - `RECOVERY_NOTIFICATION_SOUND` (可选): 自定义恢复通知声音
+   - `SEND_STARTUP_NOTIFICATION` (可选): 设置为 'false' 以禁用启动通知
+   - `NOTIFICATION_LANGUAGE` (可选): 通知语言，设置为 'zh' 使用中文，'en' 使用英文（默认）
 
 ### 5. 测试工作流
 
@@ -124,3 +128,26 @@ GitHub Actions 有以下限制：
 - 工作流文件大小不能超过 500KB
 
 更多信息，请参阅 [GitHub Actions 文档](https://docs.github.com/en/actions)。 
+
+## 新增功能
+
+### 启动通知
+
+服务启动时会发送一个通知，告知您服务已成功启动。通知内容包括：
+- 监控频率（cron 表达式）
+- 监控的网站数量
+
+您可以通过设置 `SEND_STARTUP_NOTIFICATION=false` 来禁用此功能。
+
+### 多语言支持
+
+系统支持中文和英文两种语言的通知：
+- 设置 `NOTIFICATION_LANGUAGE=zh` 使用中文通知
+- 设置 `NOTIFICATION_LANGUAGE=en` 使用英文通知（默认）
+
+语言设置会影响：
+- 通知的标题和内容
+- 网站状态描述（如"正常"、"宕机"等）
+- 通知分组（在 Bark 应用中显示为"网站监控"或"Website Monitor"）
+
+这使得通知更加友好，特别是对中文用户。 

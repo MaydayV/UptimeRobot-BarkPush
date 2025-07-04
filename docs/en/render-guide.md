@@ -44,6 +44,8 @@ In the "Environment" section, add the following variables:
 - `SEND_RECOVERY_NOTIFICATIONS` (optional): Set to 'false' to disable recovery notifications
 - `DOWN_NOTIFICATION_SOUND` (optional): Custom sound for down notifications
 - `RECOVERY_NOTIFICATION_SOUND` (optional): Custom sound for recovery notifications
+- `SEND_STARTUP_NOTIFICATION` (optional): Set to 'false' to disable startup notifications
+- `NOTIFICATION_LANGUAGE` (optional): Set to 'zh' for Chinese or 'en' for English (default)
 
 ### 5. Create the Service
 
@@ -94,3 +96,20 @@ The Render.com free plan has the following limitations:
 - The service may go to sleep after periods of inactivity
 
 For more information, see the [Render.com documentation](https://render.com/docs). 
+
+## New Features
+
+### Startup Notifications
+
+The service can send a notification when it starts up, confirming that your monitoring system is active. This feature is enabled by default.
+
+- To disable startup notifications, set the `SEND_STARTUP_NOTIFICATION` environment variable to 'false'
+- When enabled, you'll receive a notification each time the service starts
+
+### Multi-language Support
+
+Notifications can be displayed in either English or Chinese:
+
+- Set the `NOTIFICATION_LANGUAGE` environment variable to 'en' for English (default) or 'zh' for Chinese
+- This affects all notification content, including startup, down, and recovery messages
+- The language setting applies to both the notification title and body 

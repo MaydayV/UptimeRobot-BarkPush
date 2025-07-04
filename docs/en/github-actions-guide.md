@@ -67,6 +67,8 @@ jobs:
           SEND_RECOVERY_NOTIFICATIONS: ${{ secrets.SEND_RECOVERY_NOTIFICATIONS }}
           DOWN_NOTIFICATION_SOUND: ${{ secrets.DOWN_NOTIFICATION_SOUND }}
           RECOVERY_NOTIFICATION_SOUND: ${{ secrets.RECOVERY_NOTIFICATION_SOUND }}
+          SEND_STARTUP_NOTIFICATION: ${{ secrets.SEND_STARTUP_NOTIFICATION }}
+          NOTIFICATION_LANGUAGE: ${{ secrets.NOTIFICATION_LANGUAGE }}
 ```
 
 ### 4. Add Secrets
@@ -82,6 +84,8 @@ jobs:
    - `SEND_RECOVERY_NOTIFICATIONS` (optional): Set to 'false' to disable recovery notifications
    - `DOWN_NOTIFICATION_SOUND` (optional): Custom sound for down notifications
    - `RECOVERY_NOTIFICATION_SOUND` (optional): Custom sound for recovery notifications
+   - `SEND_STARTUP_NOTIFICATION` (optional): Set to 'false' to disable startup notification
+   - `NOTIFICATION_LANGUAGE` (optional): Notification language, set to 'zh' for Chinese or 'en' for English (default)
 
 ### 5. Test the Workflow
 
@@ -124,3 +128,26 @@ GitHub Actions has the following limitations:
 - Workflow files cannot exceed 500KB in size
 
 For more information, see the [GitHub Actions documentation](https://docs.github.com/en/actions). 
+
+## New Features
+
+### Startup Notification
+
+When the service starts, it sends a notification to let you know it has started successfully. The notification includes:
+- Monitoring schedule (cron expression)
+- Number of websites being monitored
+
+You can disable this feature by setting `SEND_STARTUP_NOTIFICATION=false`.
+
+### Multi-language Support
+
+The system supports notifications in both English and Chinese:
+- Set `NOTIFICATION_LANGUAGE=zh` for Chinese notifications
+- Set `NOTIFICATION_LANGUAGE=en` for English notifications (default)
+
+The language setting affects:
+- Notification titles and content
+- Website status descriptions (like "Up", "Down", etc.)
+- Notification grouping (shown as "Website Monitor" or "网站监控" in the Bark app)
+
+This makes notifications more user-friendly, especially for Chinese users. 

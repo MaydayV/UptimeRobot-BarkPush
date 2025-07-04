@@ -36,6 +36,8 @@ BARK_SERVER_URL=https://api.day.app
 # SEND_RECOVERY_NOTIFICATIONS=false
 # DOWN_NOTIFICATION_SOUND=alert
 # RECOVERY_NOTIFICATION_SOUND=complete
+# SEND_STARTUP_NOTIFICATION=false
+# NOTIFICATION_LANGUAGE=en
 ```
 
 ### 4. Start the Service with Docker Compose
@@ -92,6 +94,8 @@ module.exports = {
   // sendRecoveryNotifications: false,
   // downNotificationSound: 'alert',
   // recoveryNotificationSound: 'complete'
+  // sendStartupNotification: false,
+  // notificationLanguage: 'en'
 };
 ```
 
@@ -219,3 +223,20 @@ This service has very low resource requirements:
 - CPU: Brief usage during checks
 - Disk: ~20 MB plus log files
 - Network: Small data transfers during checks 
+
+## New Features
+
+### Startup Notifications
+
+The service can send a notification when it starts up, confirming that your monitoring system is active. This feature is enabled by default.
+
+- To disable startup notifications, set the `SEND_STARTUP_NOTIFICATION` environment variable to 'false' (Docker/system approach) or `sendStartupNotification: false` in config.js (Node.js approach)
+- When enabled, you'll receive a notification each time the service starts
+
+### Multi-language Support
+
+Notifications can be displayed in either English or Chinese:
+
+- Set the `NOTIFICATION_LANGUAGE` environment variable to 'en' for English (default) or 'zh' for Chinese (Docker/system approach) or `notificationLanguage: 'en'` in config.js (Node.js approach)
+- This affects all notification content, including startup, down, and recovery messages
+- The language setting applies to both the notification title and body 

@@ -36,6 +36,8 @@ BARK_SERVER_URL=https://api.day.app
 # SEND_RECOVERY_NOTIFICATIONS=false
 # DOWN_NOTIFICATION_SOUND=alert
 # RECOVERY_NOTIFICATION_SOUND=complete
+# SEND_STARTUP_NOTIFICATION=false
+# NOTIFICATION_LANGUAGE=zh
 ```
 
 ### 4. 使用 Docker Compose 启动服务
@@ -92,6 +94,8 @@ module.exports = {
   // sendRecoveryNotifications: false,
   // downNotificationSound: 'alert',
   // recoveryNotificationSound: 'complete'
+  // sendStartupNotification: false,
+  // notificationLanguage: 'zh'
 };
 ```
 
@@ -219,3 +223,20 @@ crontab -e
 - CPU：运行检查时的短暂使用
 - 磁盘：~20 MB 加上日志文件
 - 网络：每次检查的少量数据传输 
+
+## 新功能
+
+### 启动通知
+
+服务可以在启动时发送通知，确认您的监控系统已激活。此功能默认启用。
+
+- 要禁用启动通知，请将 `SEND_STARTUP_NOTIFICATION` 环境变量设置为 'false'（Docker/系统方式）或在 config.js 中设置 `sendStartupNotification: false`（Node.js 方式）
+- 启用后，每次服务启动时您都会收到通知
+
+### 多语言支持
+
+通知可以以中文或英文显示：
+
+- 将 `NOTIFICATION_LANGUAGE` 环境变量设置为 'zh' 使用中文或 'en' 使用英文（默认）（Docker/系统方式）或在 config.js 中设置 `notificationLanguage: 'zh'`（Node.js 方式）
+- 这会影响所有通知内容，包括启动、宕机和恢复消息
+- 语言设置适用于通知标题和正文 
