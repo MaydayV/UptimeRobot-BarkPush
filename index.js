@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const axios = require('axios');
 const cron = require('node-cron');
@@ -246,9 +245,8 @@ async function checkMonitors() {
 function init() {
   console.log('UptimeRobot to Bark notification service starting...');
   
-  
-  if (config.sendStartupNotification) {
-    
+  // 只在首次运行时发送启动通知，通过检查缓存是否为空来判断
+  if (config.sendStartupNotification && monitorStateCache.size === 0) {
     let title, message;
     
     if (config.notificationLanguage === 'zh') {
@@ -263,10 +261,10 @@ function init() {
     console.log('Startup notification sent');
   }
   
-  
+  // 执行首次检查
   checkMonitors();
   
-  
+  // 设置定时任务
   cron.schedule(config.cronSchedule, checkMonitors);
   
   console.log(`Monitoring scheduled: ${config.cronSchedule}`);
