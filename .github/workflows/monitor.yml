@@ -5,6 +5,11 @@ on:
     - cron: '*/5 * * * *' 
   workflow_dispatch:  
 
+# 添加并发控制，确保只有一个工作流实例运行
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   check-websites:
     runs-on: ubuntu-latest
