@@ -176,10 +176,10 @@ async function checkMonitors() {
     const currentStatus = monitor.status;
     const prevStatus = monitorStateCache.get(monitor.id);
     
-    
+    // 更新缓存中的状态
     monitorStateCache.set(monitor.id, currentStatus);
     
-    
+    // 网站宕机时发送通知（仅当之前状态为正常或未知时）
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
       
       let title, message;
@@ -188,7 +188,7 @@ async function checkMonitors() {
         title = `🔴 网站宕机: ${monitor.friendly_name}`;
         message = `状态: ${getStatusText(currentStatus)}\n`;
         
-        
+        // 添加日志信息（如果有）
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `时间: ${formatTime(latestLog.datetime)}\n`;
@@ -198,7 +198,7 @@ async function checkMonitors() {
         title = `🔴 Website Down: ${monitor.friendly_name}`;
         message = `Status: ${getStatusText(currentStatus)}\n`;
         
-        
+        // 添加日志信息（如果有）
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `Since: ${formatTime(latestLog.datetime)}\n`;
@@ -209,8 +209,10 @@ async function checkMonitors() {
       await sendBarkNotification(title, message, monitor.url, config.downNotificationSound);
     }
     
-    
-    else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && config.sendRecoveryNotifications) {
+    // 网站恢复时发送通知（仅当之前状态为宕机时）
+    // 并且配置允许发送恢复通知且未设置只在状态变化时通知
+    else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && 
+             config.sendRecoveryNotifications && !config.notifyOnlyOnStatusChange) {
       
       let title, message;
       
@@ -218,7 +220,7 @@ async function checkMonitors() {
         title = `🟢 网站恢复: ${monitor.friendly_name}`;
         message = `状态: ${getStatusText(currentStatus)}\n`;
         
-        
+        // 添加日志信息（如果有）
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `时间: ${formatTime(latestLog.datetime)}`;
@@ -227,7 +229,7 @@ async function checkMonitors() {
         title = `🟢 Website Recovered: ${monitor.friendly_name}`;
         message = `Status: ${getStatusText(currentStatus)}\n`;
         
-        
+        // 添加日志信息（如果有）
         if (monitor.logs && monitor.logs.length > 0) {
           const latestLog = monitor.logs[0];
           message += `At: ${formatTime(latestLog.datetime)}`;
@@ -246,7 +248,8 @@ function init() {
   console.log('UptimeRobot to Bark notification service starting...');
   
   // 只在首次运行时发送启动通知，通过检查缓存是否为空来判断
-  if (config.sendStartupNotification && monitorStateCache.size === 0) {
+  // 并且只有在未设置 notifyOnlyOnStatusChange 或其为 false 时才发送
+  if (config.sendStartupNotification && monitorStateCache.size === 0 && !config.notifyOnlyOnStatusChange) {
     let title, message;
     
     if (config.notificationLanguage === 'zh') {

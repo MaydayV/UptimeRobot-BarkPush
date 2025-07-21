@@ -65,6 +65,7 @@ Additional environment variables you can set:
 - `RECOVERY_NOTIFICATION_SOUND` (optional): Custom sound for recovery notifications
 - `SEND_STARTUP_NOTIFICATION` (optional): Set to 'false' to disable startup notifications
 - `NOTIFICATION_LANGUAGE` (optional): Set to 'zh' for Chinese or 'en' for English (default)
+- `NOTIFY_ONLY_ON_STATUS_CHANGE` (optional): Set to 'true' to only send notifications when websites go down, without startup and recovery notifications
 
 #### Option B: Config File
 
@@ -89,6 +90,7 @@ module.exports = {
   // recoveryNotificationSound: 'complete',
   // sendStartupNotification: true,
   // notificationLanguage: 'en'  // Use 'zh' for Chinese
+  // notifyOnlyOnStatusChange: true  // Only send notifications when websites go down
 };
 ```
 

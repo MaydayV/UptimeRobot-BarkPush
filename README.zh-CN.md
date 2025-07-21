@@ -65,6 +65,7 @@ BARK_DEVICE_KEY=您的设备密钥
 - `RECOVERY_NOTIFICATION_SOUND`（可选）：恢复通知的自定义声音
 - `SEND_STARTUP_NOTIFICATION`（可选）：设置为 'false' 可禁用启动通知
 - `NOTIFICATION_LANGUAGE`（可选）：设置为 'zh' 使用中文或 'en' 使用英文（默认）
+- `NOTIFY_ONLY_ON_STATUS_CHANGE`（可选）：设置为 'true' 可仅在网站状态出现问题时发送通知，不发送启动通知和恢复通知
 
 #### 方式 B：配置文件
 
@@ -89,6 +90,7 @@ module.exports = {
   // recoveryNotificationSound: 'complete',
   // sendStartupNotification: true,
   // notificationLanguage: 'zh'  // 使用 'en' 获取英文通知
+  // notifyOnlyOnStatusChange: true  // 仅在网站状态出现问题时发送通知
 };
 ```
 

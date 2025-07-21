@@ -112,16 +112,16 @@ async function checkMonitors() {
     const currentStatus = monitor.status;
     const prevStatus = monitorStateCache[monitor.id];
     
-    
+    // 更新缓存中的状态
     monitorStateCache[monitor.id] = currentStatus;
     
-    
+    // 网站宕机时发送通知（仅当之前状态为正常或未知时）
     if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
       const title = `🔴 Website Down: ${monitor.friendly_name}`;
       
       let message = `Status: ${getStatusText(currentStatus)}\n`;
       
-      
+      // 添加日志信息（如果有）
       if (monitor.logs && monitor.logs.length > 0) {
         const latestLog = monitor.logs[0];
         message += `Since: ${formatTime(latestLog.datetime)}\n`;
@@ -137,13 +137,15 @@ async function checkMonitors() {
       });
     }
     
-    
-    else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && config.sendRecoveryNotifications) {
+    // 网站恢复时发送通知（仅当之前状态为宕机时）
+    // 并且配置允许发送恢复通知且未设置只在状态变化时通知
+    else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && 
+             config.sendRecoveryNotifications && !config.notifyOnlyOnStatusChange) {
       const title = `🟢 Website Recovered: ${monitor.friendly_name}`;
       
       let message = `Status: ${getStatusText(currentStatus)}\n`;
       
-      
+      // 添加日志信息（如果有）
       if (monitor.logs && monitor.logs.length > 0) {
         const latestLog = monitor.logs[0];
         message += `At: ${formatTime(latestLog.datetime)}`;

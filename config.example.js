@@ -45,5 +45,10 @@ module.exports = {
 
   
   
-  notificationLanguage: process.env.NOTIFICATION_LANGUAGE || 'en'
+  notificationLanguage: process.env.NOTIFICATION_LANGUAGE || 'en',
+  
+  
+  
+  
+  notifyOnlyOnStatusChange: process.env.NOTIFY_ONLY_ON_STATUS_CHANGE === 'true'
 }; 
