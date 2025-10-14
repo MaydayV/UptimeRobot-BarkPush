@@ -254,10 +254,14 @@ async function checkMonitors() {
 /**
  * Initialize the monitoring service
  */
-function init() {
+async function init() {
   console.log('UptimeRobot to Bark notification service starting...');
   
-  // 只在首次运行时发送启动通知，通过检查缓存是否为空来判断
+  // 设置定时任务
+  cron.schedule(config.cronSchedule, checkMonitors);
+  console.log(`Monitoring scheduled: ${config.cronSchedule}`);
+  
+  // 只在首次运行时发送启动通知
   // 并且只有在未设置 notifyOnlyOnStatusChange 或其为 false 时才发送
   if (config.sendStartupNotification && monitorStateCache.size === 0 && !config.notifyOnlyOnStatusChange) {
     let title, message;
@@ -270,17 +274,14 @@ function init() {
       message = `Monitoring service has started successfully\nSchedule: ${config.cronSchedule}\nMonitors: ${config.monitorIds ? config.monitorIds.length : 'All'}`;
     }
     
-    sendBarkNotification(title, message, '', 'active');
+    await sendBarkNotification(title, message, '', 'active');
     console.log('Startup notification sent');
   }
   
   // 执行首次检查
-  checkMonitors();
+  await checkMonitors();
   
-  // 设置定时任务
-  cron.schedule(config.cronSchedule, checkMonitors);
-  
-  console.log(`Monitoring scheduled: ${config.cronSchedule}`);
+  console.log('Initial check completed. Service is now running.');
 }
 
 
