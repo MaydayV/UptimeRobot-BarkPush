@@ -2,8 +2,8 @@ const axios = require('axios');
 
 const config = require('../config');
 
-
-let monitorStateCache = {};
+// 使用 Map 存储状态缓存，与 index.js 保持一致
+const monitorStateCache = new Map();
 
 /**
  * Format a timestamp to a readable date/time string
@@ -19,7 +19,7 @@ async function getMonitors() {
   try {
     const response = await axios({
       method: 'get',
-      url: 'https://api.uptimerobot.com/v3/monitors',
+      url: 'https://api.uptimerobot.com/v3/getMonitors',
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache'
@@ -54,17 +54,32 @@ async function getMonitors() {
  */
 async function sendBarkNotification(title, message, url = '', sound = null) {
   try {
-    const encodedTitle = encodeURIComponent(title);
-    const encodedMessage = encodeURIComponent(message);
-    const barkUrl = `${config.barkServerUrl}/${config.barkDeviceKey}/${encodedTitle}/${encodedMessage}`;
+    console.log('Sending Bark notification...');
     
-    const params = new URLSearchParams();
-    if (url) params.append('url', url);
-    if (sound) params.append('sound', sound);
+    // 使用 POST 方式发送通知，与 index.js 保持一致
+    const postData = new URLSearchParams();
+    postData.append('title', title);
+    postData.append('body', message);
     
-    const finalUrl = params.toString() ? `${barkUrl}?${params.toString()}` : barkUrl;
+    // 添加可选参数
+    if (url) postData.append('url', url);
+    if (sound) postData.append('sound', sound);
     
-    const response = await axios.get(finalUrl);
+    // 添加分组（根据语言设置）
+    if (config.notificationLanguage) {
+      postData.append('group', config.notificationLanguage === 'zh' ? '网站监控' : 'Website Monitor');
+    }
+    
+    // 发送 POST 请求
+    const response = await axios.post(
+      `${config.barkServerUrl}/${config.barkDeviceKey}`,
+      postData.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
     
     if (response.data.code === 200) {
       console.log(`Notification sent: ${title}`);
@@ -75,6 +90,10 @@ async function sendBarkNotification(title, message, url = '', sound = null) {
     }
   } catch (error) {
     console.error('Failed to send Bark notification:', error.message);
+    if (error.response) {
+      console.error('  Status:', error.response.status);
+      console.error('  Response:', JSON.stringify(error.response.data, null, 2));
+    }
     return false;
   }
 }
@@ -83,13 +102,24 @@ async function sendBarkNotification(title, message, url = '', sound = null) {
  * Get the status text for a monitor
  */
 function getStatusText(statusCode) {
-  switch (statusCode) {
-    case 0: return 'Paused';
-    case 1: return 'Not checked yet';
-    case 2: return 'Up';
-    case 8: return 'Seems Down';
-    case 9: return 'Down';
-    default: return 'Unknown';
+  if (config.notificationLanguage === 'zh') {
+    switch (statusCode) {
+      case 0: return '已暂停';
+      case 1: return '未检查';
+      case 2: return '正常';
+      case 8: return '似乎宕机';
+      case 9: return '宕机';
+      default: return '未知';
+    }
+  } else {
+    switch (statusCode) {
+      case 0: return 'Paused';
+      case 1: return 'Not checked yet';
+      case 2: return 'Up';
+      case 8: return 'Seems Down';
+      case 9: return 'Down';
+      default: return 'Unknown';
+    }
   }
 }
 
@@ -110,60 +140,105 @@ async function checkMonitors() {
   
   for (const monitor of monitors) {
     const currentStatus = monitor.status;
-    const prevStatus = monitorStateCache[monitor.id];
+    const prevStatus = monitorStateCache.get(monitor.id);
     
-    // 更新缓存中的状态
-    monitorStateCache[monitor.id] = currentStatus;
-    
-    // 网站宕机时发送通知（仅当之前状态为正常或未知时）
-    if ((prevStatus === undefined || prevStatus === 2) && (currentStatus === 8 || currentStatus === 9)) {
-      const title = `🔴 Website Down: ${monitor.friendly_name}`;
+    // 只有当状态发生变化时才处理
+    if (prevStatus !== currentStatus) {
+      // 更新缓存中的状态
+      monitorStateCache.set(monitor.id, currentStatus);
       
-      let message = `Status: ${getStatusText(currentStatus)}\n`;
-      
-      // 添加日志信息（如果有）
-      if (monitor.logs && monitor.logs.length > 0) {
-        const latestLog = monitor.logs[0];
-        message += `Since: ${formatTime(latestLog.datetime)}\n`;
-        message += `Reason: ${latestLog.reason.success || latestLog.reason.error || 'Unknown'}`;
+      // 网站从正常变为宕机时发送通知
+      if (prevStatus === 2 && (currentStatus === 8 || currentStatus === 9)) {
+        let title, message;
+        
+        if (config.notificationLanguage === 'zh') {
+          title = `🔴 网站宕机: ${monitor.friendly_name}`;
+          message = `状态: ${getStatusText(currentStatus)}\n`;
+          
+          // 添加日志信息（如果有）
+          if (monitor.logs && monitor.logs.length > 0) {
+            const latestLog = monitor.logs[0];
+            message += `时间: ${formatTime(latestLog.datetime)}\n`;
+            message += `原因: ${latestLog.reason.success || latestLog.reason.error || '未知'}`;
+          }
+        } else {
+          title = `🔴 Website Down: ${monitor.friendly_name}`;
+          message = `Status: ${getStatusText(currentStatus)}\n`;
+          
+          // 添加日志信息（如果有）
+          if (monitor.logs && monitor.logs.length > 0) {
+            const latestLog = monitor.logs[0];
+            message += `Since: ${formatTime(latestLog.datetime)}\n`;
+            message += `Reason: ${latestLog.reason.success || latestLog.reason.error || 'Unknown'}`;
+          }
+        }
+        
+        await sendBarkNotification(title, message, monitor.url, config.downNotificationSound);
+        
+        results.push({
+          monitor: monitor.friendly_name,
+          status: 'down',
+          notified: true
+        });
       }
-      
-      await sendBarkNotification(title, message, monitor.url, config.downNotificationSound);
-      
-      results.push({
-        monitor: monitor.friendly_name,
-        status: 'down',
-        notified: true
-      });
-    }
-    
-    // 网站恢复时发送通知（仅当之前状态为宕机时）
-    // 并且配置允许发送恢复通知且未设置只在状态变化时通知
-    else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && 
-             config.sendRecoveryNotifications && !config.notifyOnlyOnStatusChange) {
-      const title = `🟢 Website Recovered: ${monitor.friendly_name}`;
-      
-      let message = `Status: ${getStatusText(currentStatus)}\n`;
-      
-      // 添加日志信息（如果有）
-      if (monitor.logs && monitor.logs.length > 0) {
-        const latestLog = monitor.logs[0];
-        message += `At: ${formatTime(latestLog.datetime)}`;
+      // 网站从宕机恢复时发送通知（如果配置允许）
+      else if ((prevStatus === 8 || prevStatus === 9) && currentStatus === 2 && config.sendRecoveryNotifications) {
+        let title, message;
+        
+        if (config.notificationLanguage === 'zh') {
+          title = `🟢 网站恢复: ${monitor.friendly_name}`;
+          message = `状态: ${getStatusText(currentStatus)}\n`;
+          
+          // 添加日志信息（如果有）
+          if (monitor.logs && monitor.logs.length > 0) {
+            const latestLog = monitor.logs[0];
+            message += `时间: ${formatTime(latestLog.datetime)}`;
+          }
+        } else {
+          title = `🟢 Website Recovered: ${monitor.friendly_name}`;
+          message = `Status: ${getStatusText(currentStatus)}\n`;
+          
+          // 添加日志信息（如果有）
+          if (monitor.logs && monitor.logs.length > 0) {
+            const latestLog = monitor.logs[0];
+            message += `At: ${formatTime(latestLog.datetime)}`;
+          }
+        }
+        
+        await sendBarkNotification(title, message, monitor.url, config.recoveryNotificationSound);
+        
+        results.push({
+          monitor: monitor.friendly_name,
+          status: 'recovered',
+          notified: true
+        });
+      } else {
+        // 状态发生了变化但不是上述情况（例如从未检查变为正常）
+        results.push({
+          monitor: monitor.friendly_name,
+          status: getStatusText(currentStatus),
+          notified: false,
+          note: 'Status changed but no notification sent'
+        });
       }
-      
-      await sendBarkNotification(title, message, monitor.url, config.recoveryNotificationSound);
-      
-      results.push({
-        monitor: monitor.friendly_name,
-        status: 'recovered',
-        notified: true
-      });
     } else {
-      results.push({
-        monitor: monitor.friendly_name,
-        status: getStatusText(currentStatus),
-        notified: false
-      });
+      // 初次检查，记录状态但不发送通知
+      if (prevStatus === undefined) {
+        monitorStateCache.set(monitor.id, currentStatus);
+        results.push({
+          monitor: monitor.friendly_name,
+          status: getStatusText(currentStatus),
+          notified: false,
+          note: 'Initial check'
+        });
+      } else {
+        // 状态未变化，不发送通知
+        results.push({
+          monitor: monitor.friendly_name,
+          status: getStatusText(currentStatus),
+          notified: false
+        });
+      }
     }
   }
   

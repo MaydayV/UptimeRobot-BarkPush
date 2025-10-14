@@ -45,7 +45,7 @@ npm install
 通过复制提供的示例创建 `.env` 文件：
 
 ```bash
-cp .env.example .env
+cp env.example .env
 ```
 
 然后编辑 `.env` 文件，填入您的值：

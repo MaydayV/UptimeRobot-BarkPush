@@ -45,7 +45,7 @@ You have two options for configuration:
 Create a `.env` file by copying the provided example:
 
 ```bash
-cp .env.example .env
+cp env.example .env
 ```
 
 Then edit the `.env` file with your values:
