@@ -131,40 +131,104 @@ docker run -e UPTIMEROBOT_API_KEY=your_key -e BARK_DEVICE_KEY=your_key uptimerob
 
 4. 部署项目
 
-## 免费替代方案
+## 部署方案
 
-如果您没有 Vercel Pro 计划，可以考虑以下免费替代方案：
+本项目支持四种部署方式，选择最适合您的方案：
 
-### 1. 使用 GitHub Actions
+### 🌟 方案对比
 
-GitHub Actions 可以免费运行定时工作流程，最频繁可以每 5 分钟运行一次。
+| 方案 | 定时精确性 | 费用 | 难度 | 推荐场景 |
+|------|----------|------|------|---------|
+| **Vercel + cron-job.org** | ⭐⭐⭐⭐⭐ 精确 | ✅ 免费 | ⭐⭐ 简单 | **推荐首选** |
+| GitHub Actions | ⭐⭐ 延迟10-30分钟 | ✅ 免费 | ⭐⭐ 简单 | 对时间要求不高 |
+| Docker / 自托管 | ⭐⭐⭐⭐⭐ 完全控制 | 💰 需服务器 | ⭐⭐⭐ 中等 | 有服务器资源 |
+| Cloudflare Workers | ⭐⭐⭐⭐ 较精确 | ✅ 免费 | ⭐⭐⭐⭐ 复杂 | 熟悉 Workers |
 
-[📖 详细的 GitHub Actions 部署指南](docs/zh/github-actions-guide.md)
+### 1️⃣ Vercel + cron-job.org（推荐）
 
-### 2. 使用 Cloudflare Workers
+**最佳方案**：定时精确、完全免费、配置简单
 
-Cloudflare Workers 有一个免费计划，允许使用 Cron Triggers：
+- ✅ 定时执行精确（误差<1分钟）
+- ✅ 完全免费
+- ✅ 配置简单（10分钟完成）
+- ✅ 可靠稳定
 
-[📖 详细的 Cloudflare Workers 部署指南](docs/zh/cloudflare-workers-guide.md)
+[📖 详细部署指南：Vercel + cron-job.org](CRON-JOB-ORG-GUIDE.md)
 
-### 3. 使用 Render.com
+### 2️⃣ GitHub Actions
 
-Render 提供免费的 cron jobs，可以设置为每小时运行多次：
+**备选方案**：完全免费，但定时不太精确
 
-[📖 详细的 Render.com 部署指南](docs/zh/render-guide.md)
+- ⚠️ 定时可能延迟10-30分钟（GitHub Actions 限制）
+- ✅ 完全免费
+- ✅ 配置简单
+- ⚠️ 适合对监控时间要求不严格的场景
 
-### 4. 使用自托管方式
+[📖 详细部署指南：GitHub Actions](docs/zh/github-actions-guide.md)
 
-如果您有一台始终在线的计算机或服务器，可以使用 Docker 在那里运行此服务：
+### 3️⃣ Docker / 自托管
 
-[📖 详细的自托管部署指南](docs/zh/self-hosting-guide.md)
+**专业方案**：完全控制，适合有服务器的用户
+
+- ✅ 定时精确、完全控制
+- ✅ 使用 Docker 一键部署
+- 💰 需要服务器（VPS、NAS 等）
+- ⭐⭐⭐ 需要一定技术基础
+
+**快速开始：**
+
+```bash
+# 方式 1：使用 docker-compose（推荐）
+docker-compose up -d
+
+# 方式 2：直接使用 Docker
+docker build -t uptimerobot-bark .
+docker run -d \
+  -e UPTIMEROBOT_API_KEY=your_key \
+  -e BARK_DEVICE_KEY=your_key \
+  -e NOTIFICATION_LANGUAGE=zh \
+  uptimerobot-bark
+
+# 方式 3：直接运行（需要 Node.js）
+npm install
+npm start
+```
+
+[📖 详细部署指南：自托管](docs/zh/self-hosting-guide.md)
+
+### 4️⃣ 其他平台
+
+**Cloudflare Workers**
+
+- 适合熟悉 Cloudflare 的用户
+- 免费计划支持 Cron Triggers
+
+[📖 详细部署指南：Cloudflare Workers](docs/zh/cloudflare-workers-guide.md)
+
+**Render.com**
+
+- 免费的 cron jobs
+- 每小时可运行多次
+
+[📖 详细部署指南：Render.com](docs/zh/render-guide.md)
+
+## 📚 文档索引
+
+- **[部署方案对比](DEPLOYMENT-COMPARISON.md)** - 详细对比四种部署方式
+- **[项目结构说明](PROJECT-STRUCTURE.md)** - 了解各文件用途和使用场景
+- **[测试和日志说明](TESTING.md)** - 理解系统日志和通知逻辑
+- **[GitHub Actions 修复说明](GITHUB-ACTIONS-FIX.md)** - GitHub Actions 常见问题
 
 ## 测试
 
 您可以通过手动运行代码来测试服务：
 
 ```bash
+# 测试长期运行服务（Docker/自托管）
 node index.js
+
+# 测试单次检查（GitHub Actions）
+node check-once.js
 ```
 
 ## 工作原理

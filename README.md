@@ -131,40 +131,104 @@ If you have a Vercel Pro plan:
 
 4. Deploy the project
 
-## Free Alternatives
+## Deployment Options
 
-If you don't have a Vercel Pro plan, consider these free alternatives:
+This project supports four deployment methods. Choose the one that best fits your needs:
 
-### 1. Using GitHub Actions
+### 🌟 Comparison
 
-GitHub Actions can run scheduled workflows for free, as frequently as every 5 minutes.
+| Method | Timing Accuracy | Cost | Difficulty | Best For |
+|--------|----------------|------|-----------|----------|
+| **Vercel + cron-job.org** | ⭐⭐⭐⭐⭐ Precise | ✅ Free | ⭐⭐ Easy | **Recommended** |
+| GitHub Actions | ⭐⭐ 10-30 min delay | ✅ Free | ⭐⭐ Easy | Low timing requirements |
+| Docker / Self-hosted | ⭐⭐⭐⭐⭐ Full control | 💰 Requires server | ⭐⭐⭐ Medium | Have server resources |
+| Cloudflare Workers | ⭐⭐⭐⭐ Accurate | ✅ Free | ⭐⭐⭐⭐ Complex | Familiar with Workers |
 
-[📖 Detailed GitHub Actions Deployment Guide](docs/en/github-actions-guide.md)
+### 1️⃣ Vercel + cron-job.org (Recommended)
 
-### 2. Using Cloudflare Workers
+**Best Option**: Accurate timing, completely free, easy setup
 
-Cloudflare Workers has a free plan that allows Cron Triggers:
+- ✅ Precise execution (< 1 min error)
+- ✅ Completely free
+- ✅ Simple configuration (10 min setup)
+- ✅ Reliable and stable
 
-[📖 Detailed Cloudflare Workers Deployment Guide](docs/en/cloudflare-workers-guide.md)
+[📖 Detailed Guide: Vercel + cron-job.org](CRON-JOB-ORG-GUIDE.md)
 
-### 3. Using Render.com
+### 2️⃣ GitHub Actions
 
-Render offers free cron jobs that can be set to run multiple times per hour:
+**Alternative**: Completely free, but less precise timing
 
-[📖 Detailed Render.com Deployment Guide](docs/en/render-guide.md)
+- ⚠️ May delay 10-30 minutes (GitHub Actions limitation)
+- ✅ Completely free
+- ✅ Simple configuration
+- ⚠️ Suitable for non-critical timing requirements
 
-### 4. Self-hosting
+[📖 Detailed Guide: GitHub Actions](docs/en/github-actions-guide.md)
 
-If you have a computer or server that's always online, you can run this service using Docker:
+### 3️⃣ Docker / Self-hosted
 
-[📖 Detailed Self-hosting Guide](docs/en/self-hosting-guide.md)
+**Professional Option**: Full control, for users with servers
+
+- ✅ Precise timing, full control
+- ✅ One-click deployment with Docker
+- 💰 Requires server (VPS, NAS, etc.)
+- ⭐⭐⭐ Requires technical knowledge
+
+**Quick Start:**
+
+```bash
+# Option 1: Using docker-compose (Recommended)
+docker-compose up -d
+
+# Option 2: Using Docker directly
+docker build -t uptimerobot-bark .
+docker run -d \
+  -e UPTIMEROBOT_API_KEY=your_key \
+  -e BARK_DEVICE_KEY=your_key \
+  -e NOTIFICATION_LANGUAGE=en \
+  uptimerobot-bark
+
+# Option 3: Run directly (Requires Node.js)
+npm install
+npm start
+```
+
+[📖 Detailed Guide: Self-hosting](docs/en/self-hosting-guide.md)
+
+### 4️⃣ Other Platforms
+
+**Cloudflare Workers**
+
+- For users familiar with Cloudflare
+- Free plan supports Cron Triggers
+
+[📖 Detailed Guide: Cloudflare Workers](docs/en/cloudflare-workers-guide.md)
+
+**Render.com**
+
+- Free cron jobs
+- Can run multiple times per hour
+
+[📖 Detailed Guide: Render.com](docs/en/render-guide.md)
+
+## 📚 Documentation Index
+
+- **[Deployment Comparison](DEPLOYMENT-COMPARISON.md)** - Detailed comparison of four deployment methods
+- **[Project Structure](PROJECT-STRUCTURE.md)** - Understand file purposes and usage scenarios  
+- **[Testing Guide](TESTING.md)** - Understanding system logs and notification logic
+- **[GitHub Actions Fix](GITHUB-ACTIONS-FIX.md)** - GitHub Actions common issues
 
 ## Testing
 
 You can test the service by running the code manually:
 
 ```bash
+# Test long-running service (Docker/Self-hosted)
 node index.js
+
+# Test single check (GitHub Actions)
+node check-once.js
 ```
 
 ## How it works
