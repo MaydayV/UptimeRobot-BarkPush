@@ -269,7 +269,7 @@ GET /api/cron
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
 
 # 2. 安装依赖

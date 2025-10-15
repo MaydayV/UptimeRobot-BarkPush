@@ -26,7 +26,7 @@ A service that monitors website availability using UptimeRobot API and sends not
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
 ```
 

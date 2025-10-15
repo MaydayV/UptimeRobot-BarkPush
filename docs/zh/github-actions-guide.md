@@ -22,9 +22,10 @@
 2. 将 UptimeRobot-BarkPush 代码克隆到本地，然后推送到新仓库
 
 ```bash
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
-git remote set-url origin https://github.com/yourusername/your-new-repo.git
+# 先在 GitHub 上 Fork 仓库，然后：
+git remote set-url origin https://github.com/你的用户名/UptimeRobot-BarkPush.git
 git push -u origin main
 ```
 

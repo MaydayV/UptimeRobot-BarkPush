@@ -22,9 +22,10 @@ This guide will help you deploy the UptimeRobot-BarkPush service using GitHub Ac
 2. Clone the UptimeRobot-BarkPush code to your local machine, then push to your new repository
 
 ```bash
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
-git remote set-url origin https://github.com/yourusername/your-new-repo.git
+# Fork the repository on GitHub first, then:
+git remote set-url origin https://github.com/YOUR_USERNAME/UptimeRobot-BarkPush.git
 git push -u origin main
 ```
 

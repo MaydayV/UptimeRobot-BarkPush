@@ -19,7 +19,7 @@
 ### 2. 克隆仓库
 
 ```bash
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
 ```
 
@@ -74,7 +74,7 @@ docker-compose up -d --build
 ### 2. 克隆仓库并安装依赖
 
 ```bash
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
 npm install
 ```

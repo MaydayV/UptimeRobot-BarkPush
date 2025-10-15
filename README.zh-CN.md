@@ -26,7 +26,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/yourusername/UptimeRobot-BarkPush.git
+git clone https://github.com/MaydayV/UptimeRobot-BarkPush.git
 cd UptimeRobot-BarkPush
 ```
 
