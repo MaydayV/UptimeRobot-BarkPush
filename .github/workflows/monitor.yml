@@ -42,7 +42,7 @@ jobs:
           EOL
         
       - name: Run website check
-        run: node index.js
+        run: node check-once.js
         env:
           UPTIMEROBOT_API_KEY: ${{ secrets.UPTIMEROBOT_API_KEY }}
           BARK_DEVICE_KEY: ${{ secrets.BARK_DEVICE_KEY }}
@@ -51,5 +51,4 @@ jobs:
           SEND_RECOVERY_NOTIFICATIONS: ${{ secrets.SEND_RECOVERY_NOTIFICATIONS }}
           DOWN_NOTIFICATION_SOUND: ${{ secrets.DOWN_NOTIFICATION_SOUND }}
           RECOVERY_NOTIFICATION_SOUND: ${{ secrets.RECOVERY_NOTIFICATION_SOUND }}
-          SEND_STARTUP_NOTIFICATION: ${{ secrets.SEND_STARTUP_NOTIFICATION || 'false' }}
           NOTIFICATION_LANGUAGE: ${{ secrets.NOTIFICATION_LANGUAGE }} 
