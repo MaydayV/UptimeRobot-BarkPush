@@ -22,7 +22,7 @@ async function getMonitors() {
     formData.append('api_key', apiKey);
     formData.append('format', 'json');
     formData.append('logs', '1');  // 获取最近的日志
-    formData.append('log_types', '1-2');  // 1=宕机, 2=恢复
+    formData.append('logs_limit', '10');  // 获取最近10条日志
     
     if (config.monitorIds && config.monitorIds.length > 0) {
       formData.append('monitors', config.monitorIds.join('-'));
@@ -148,6 +148,11 @@ async function checkMonitors() {
   for (const monitor of monitors) {
     const currentStatus = monitor.status;
     console.log(`Monitor: ${monitor.friendly_name}, Current Status: ${getStatusText(currentStatus)}`);
+    
+    // 调试：显示日志数量
+    if (monitor.logs) {
+      console.log(`  Logs found: ${monitor.logs.length}`);
+    }
     
     // 检查是否有最近的日志（状态变化）
     if (monitor.logs && monitor.logs.length > 0) {
