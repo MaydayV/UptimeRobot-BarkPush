@@ -251,19 +251,8 @@ async function checkMonitors() {
 
 module.exports = async (req, res) => {
   try {
-    
     if (req.method !== 'GET') {
       return res.status(405).json({ error: 'Method not allowed' });
-    }
-    
-    
-    const isCron = req.headers['x-vercel-cron'] === 'true';
-    const isManualTrigger = req.query.trigger === 'manual';
-    
-    if (!isCron && !isManualTrigger) {
-      return res.status(400).json({ 
-        error: 'This endpoint should be called by Vercel cron jobs or with ?trigger=manual'
-      });
     }
     
     const result = await checkMonitors();
