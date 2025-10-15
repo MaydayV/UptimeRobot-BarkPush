@@ -153,7 +153,7 @@ docker run -e UPTIMEROBOT_API_KEY=your_key -e BARK_DEVICE_KEY=your_key uptimerob
 - ✅ 配置简单（10分钟完成）
 - ✅ 可靠稳定
 
-[📖 详细部署指南：Vercel + cron-job.org](CRON-JOB-ORG-GUIDE.md)
+[📖 详细部署指南：Vercel + cron-job.org](docs/zh/cron-job-org-guide.md)
 
 ### 2️⃣ GitHub Actions
 
@@ -214,10 +214,10 @@ npm start
 
 ## 📚 文档索引
 
-- **[部署方案对比](DEPLOYMENT-COMPARISON.md)** - 详细对比四种部署方式
-- **[项目结构说明](PROJECT-STRUCTURE.md)** - 了解各文件用途和使用场景
-- **[测试和日志说明](TESTING.md)** - 理解系统日志和通知逻辑
-- **[GitHub Actions 修复说明](GITHUB-ACTIONS-FIX.md)** - GitHub Actions 常见问题
+- **[部署方案对比](docs/zh/deployment-comparison.md)** - 详细对比四种部署方式
+- **[项目结构说明](docs/zh/project-structure.md)** - 了解各文件用途和使用场景
+- **[测试和日志说明](docs/zh/testing.md)** - 理解系统日志和通知逻辑
+- **[GitHub Actions 修复说明](docs/zh/github-actions-fix.md)** - GitHub Actions 常见问题
 
 ## 测试
 

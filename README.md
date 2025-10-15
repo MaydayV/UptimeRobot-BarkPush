@@ -153,7 +153,7 @@ This project supports four deployment methods. Choose the one that best fits you
 - ✅ Simple configuration (10 min setup)
 - ✅ Reliable and stable
 
-[📖 Detailed Guide: Vercel + cron-job.org](CRON-JOB-ORG-GUIDE.md)
+[📖 Detailed Guide: Vercel + cron-job.org](docs/en/cron-job-org-guide.md)
 
 ### 2️⃣ GitHub Actions
 
@@ -214,10 +214,10 @@ npm start
 
 ## 📚 Documentation Index
 
-- **[Deployment Comparison](DEPLOYMENT-COMPARISON.md)** - Detailed comparison of four deployment methods
-- **[Project Structure](PROJECT-STRUCTURE.md)** - Understand file purposes and usage scenarios  
-- **[Testing Guide](TESTING.md)** - Understanding system logs and notification logic
-- **[GitHub Actions Fix](GITHUB-ACTIONS-FIX.md)** - GitHub Actions common issues
+- **[Deployment Comparison](docs/en/deployment-comparison.md)** - Detailed comparison of four deployment methods
+- **[Project Structure](docs/en/project-structure.md)** - Understand file purposes and usage scenarios  
+- **[Testing Guide](docs/en/testing.md)** - Understanding system logs and notification logic
+- **[GitHub Actions Fix](docs/en/github-actions-fix.md)** - GitHub Actions common issues
 
 ## Testing
 

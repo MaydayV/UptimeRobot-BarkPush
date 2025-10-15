@@ -309,19 +309,19 @@ curl https://your-app.vercel.app/api/cron
 ## 📚 相关文档
 
 ### 快速开始
-- [README.zh-CN.md](README.zh-CN.md) - 中文文档
-- [README.md](README.md) - 英文文档
+- [README.zh-CN.md](../../README.zh-CN.md) - 中文文档
+- [README.md](../../README.md) - 英文文档
 
 ### 部署指南
-- [CRON-JOB-ORG-GUIDE.md](CRON-JOB-ORG-GUIDE.md) - Vercel + cron-job.org 详细指南
-- [docs/zh/github-actions-guide.md](docs/zh/github-actions-guide.md) - GitHub Actions 指南
-- [docs/zh/self-hosting-guide.md](docs/zh/self-hosting-guide.md) - 自托管指南
-- [docs/zh/cloudflare-workers-guide.md](docs/zh/cloudflare-workers-guide.md) - Cloudflare Workers 指南
+- [cron-job-org-guide.md](cron-job-org-guide.md) - Vercel + cron-job.org 详细指南
+- [github-actions-guide.md](github-actions-guide.md) - GitHub Actions 指南
+- [self-hosting-guide.md](self-hosting-guide.md) - 自托管指南
+- [cloudflare-workers-guide.md](cloudflare-workers-guide.md) - Cloudflare Workers 指南
 
 ### 参考文档
-- [DEPLOYMENT-COMPARISON.md](DEPLOYMENT-COMPARISON.md) - 部署方案对比
-- [GITHUB-ACTIONS-FIX.md](GITHUB-ACTIONS-FIX.md) - GitHub Actions 问题修复说明
-- [TESTING.md](TESTING.md) - 测试和日志说明
+- [deployment-comparison.md](deployment-comparison.md) - 部署方案对比
+- [github-actions-fix.md](github-actions-fix.md) - GitHub Actions 问题修复说明
+- [testing.md](testing.md) - 测试和日志说明
 
 ## 🔧 常见问题
 

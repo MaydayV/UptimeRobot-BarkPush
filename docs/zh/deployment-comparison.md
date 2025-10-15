@@ -54,7 +54,7 @@
 
 ### 📖 部署指南
 
-[详细部署指南：CRON-JOB-ORG-GUIDE.md](CRON-JOB-ORG-GUIDE.md)
+[详细部署指南：cron-job-org-guide.md](cron-job-org-guide.md)
 
 ---
 
@@ -95,7 +95,7 @@
 
 ### 📖 部署指南
 
-[详细部署指南：docs/zh/github-actions-guide.md](docs/zh/github-actions-guide.md)
+[详细部署指南：github-actions-guide.md](github-actions-guide.md)
 
 ---
 
@@ -183,7 +183,7 @@ pm2 startup
 
 ### 📖 部署指南
 
-[详细部署指南：docs/zh/self-hosting-guide.md](docs/zh/self-hosting-guide.md)
+[详细部署指南：self-hosting-guide.md](self-hosting-guide.md)
 
 ---
 
@@ -219,7 +219,7 @@ pm2 startup
 
 ### 📖 部署指南
 
-[详细部署指南：docs/zh/cloudflare-workers-guide.md](docs/zh/cloudflare-workers-guide.md)
+[详细部署指南：cloudflare-workers-guide.md](cloudflare-workers-guide.md)
 
 ---
 
@@ -262,7 +262,7 @@ pm2 startup
 ### 从 GitHub Actions 迁移到 Vercel + cron-job.org
 
 1. 保留 GitHub Actions（作为备用）
-2. 按照 [CRON-JOB-ORG-GUIDE.md](CRON-JOB-ORG-GUIDE.md) 部署 Vercel
+2. 按照 [cron-job-org-guide.md](cron-job-org-guide.md) 部署 Vercel
 3. 配置 cron-job.org
 4. 测试运行正常后，可以禁用 GitHub Actions
 
