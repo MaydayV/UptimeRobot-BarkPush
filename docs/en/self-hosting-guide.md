@@ -68,7 +68,7 @@ docker-compose up -d --build
 
 ### 1. Prerequisites
 
-1. Ensure your server has [Node.js](https://nodejs.org/) (14.x or higher) installed
+1. Ensure your server has [Node.js](https://nodejs.org/) (20.x or higher) installed
 2. Have your UptimeRobot API key and Bark device key ready
 
 ### 2. Clone the Repository and Install Dependencies

@@ -17,7 +17,7 @@ A service that monitors website availability using UptimeRobot API and sends not
 
 ## Requirements
 
-- Node.js 14 or higher
+- Node.js 20 or higher
 - UptimeRobot account with API key
 - Bark app installed on your iOS device
 

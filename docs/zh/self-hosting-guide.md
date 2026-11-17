@@ -68,7 +68,7 @@ docker-compose up -d --build
 
 ### 1. 准备工作
 
-1. 确保您的服务器已安装 [Node.js](https://nodejs.org/) (14.x 或更高版本)
+1. 确保您的服务器已安装 [Node.js](https://nodejs.org/) (20.x 或更高版本)
 2. 准备好您的 UptimeRobot API 密钥和 Bark 设备密钥
 
 ### 2. 克隆仓库并安装依赖
